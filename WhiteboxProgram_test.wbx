@@ -1,0 +1,137 @@
+
+[TestFixture]
+class WhiteboxProgramTests extends WhiteboxProgram
+{
+   [Test]
+   public void mainTest()
+   {
+   }
+   [Test]
+   public void WhiteboxProgramCtor1Test()
+   {
+      MockWhiteboxProgram testClass = new MockWhiteboxProgram();
+      assert.areEqual(testClass.lineDelimiter,"");
+      assert.areEqual(testClass.startBlock,"");
+      assert.areEqual(testClass.endBlock,"");
+   }
+   [Test]
+   public void generateSynTreeTest()
+   {
+      ClassList rtnVal = generateSynTree(0);
+      assert.areEqual(rtnVal,"");
+   }
+   [Test]
+   public void findAssertionsAndTestsTest()
+   {
+      ClassList rtnVal = findAssertionsAndTests(01);
+      assert.areEqual(rtnVal,"");
+   }
+   [Test]
+   public void generateTestsTest()
+   {
+      WhiteboxProgram testClass0 = new MockWhiteboxProgram()
+;      generateTests(01);
+      assert.areEqual(testClass0.testProgram,"");
+   }
+   [Test]
+   public void getClassListTest()
+   {
+      ClassList rtnVal = getClassList();
+      assert.areEqual(rtnVal,"");
+   }
+   [Test]
+   public void getSyntaxTreeTest()
+   {
+      ClassList rtnVal = getSyntaxTree(0);
+      assert.areEqual(rtnVal,"");
+   }
+   [Test]
+   public void loadFileTest()
+   {
+      String[] rtnVal = loadFile(0);
+      assert.areEqual(rtnVal,"");
+   }
+   [Test]
+   public void dumpTestsTest()
+   {
+      String rtnVal = dumpTests(0);
+      assert.areEqual(rtnVal,"");
+   }
+   [Test]
+   public void generateTestTest()
+   {
+      String rtnVal = generateTest(012);
+      assert.areEqual(rtnVal,"");
+   }
+   [Test]
+   public void outputTestsTest()
+   {
+   }
+   [Test]
+   public void isClassDeclTest()
+   {
+      boolean rtnVal = isClassDecl(0);
+      assert.areEqual(rtnVal,"");
+   }
+   [Test]
+   public void isMethodDeclTest()
+   {
+      boolean rtnVal = isMethodDecl(0);
+      assert.areEqual(rtnVal,"");
+   }
+   [Test]
+   public void isConstrDeclTest()
+   {
+      boolean rtnVal = isConstrDecl(01);
+      assert.areEqual(rtnVal,"");
+   }
+   [Test]
+   public void isVarDeclTest()
+   {
+      boolean rtnVal = isVarDecl(0);
+      assert.areEqual(rtnVal,"");
+   }
+   [Test]
+   public void beginsBlockTest()
+   {
+      boolean rtnVal = beginsBlock(0);
+      assert.areEqual(rtnVal,"");
+   }
+   [Test]
+   public void endsBlockTest()
+   {
+      boolean rtnVal = endsBlock(0);
+      assert.areEqual(rtnVal,"");
+   }
+   [Test]
+   public void beginsCommentBlockTest()
+   {
+      boolean rtnVal = beginsCommentBlock(0);
+      assert.areEqual(rtnVal,"");
+   }
+   [Test]
+   public void containsCommentBlockTest()
+   {
+      boolean rtnVal = containsCommentBlock(0);
+      assert.areEqual(rtnVal,"");
+   }
+   [Test]
+   public void endsCommentBlockTest()
+   {
+      boolean rtnVal = endsCommentBlock(0);
+      assert.areEqual(rtnVal,"");
+   }
+   [Test]
+   public void yieldsAssertionTest()
+   {
+      boolean rtnVal = yieldsAssertion(01);
+      assert.areEqual(rtnVal,"");
+   }
+   [Test]
+   public void yieldsNewTestTest()
+   {
+      boolean rtnVal = yieldsNewTest(01);
+      assert.areEqual(rtnVal,"");
+   }
+}
+

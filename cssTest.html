@@ -1,0 +1,31 @@
+<html>
+<body>
+<table border="0" cellpadding="0" cellspacing="0"><tr><pre>   VarInfo(String in, int lineNo)</pre></tr>
+<tr><pre>   {</pre></tr>
+<tr><pre>      startLine = lineNo;</pre></tr>
+<tr bgcolor="red"><pre>      endLine = lineNo;</pre></tr>
+<tr><pre></pre></tr>  
+<tr><pre>      access = WhiteboxUtils.getAccessLevel(in);</pre></tr>
+<tr><pre>      in = WhiteboxUtils.removeAccessModifiers(in);</pre></tr>
+<tr><pre></pre></tr>      
+<tr><pre>      String temp = in;</pre></tr>
+<tr><pre>      try</pre></tr>
+<tr><pre>      {</pre></tr>
+<tr><pre>         temp = temp.substring(0, temp.indexOf(';'));</pre></tr>
+<tr><pre>         temp = temp.substring(0, temp.indexOf('='));</pre></tr>
+<tr><pre>      }</pre></tr>
+<tr><pre>      catch(StringIndexOutOfBoundsException ex)</pre></tr>
+<tr><pre>      {}</pre></tr>
+<tr><pre>      temp.trim();</pre></tr>
+<tr><pre></pre></tr>      
+<tr><pre>      String[] vardecl = temp.split(" ");</pre></tr>
+<tr><pre>      type = vardecl[0];</pre></tr>
+<tr><pre>      name = vardecl[1];</pre></tr>
+<tr><pre></pre></tr>     
+<tr><pre>      nDimensions = countDimensions();</pre></tr>
+<tr><pre></pre></tr>      
+<tr><pre>   }</pre></tr>
+</table>
+</body>
+
+</html>

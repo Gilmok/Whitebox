@@ -1,0 +1,339 @@
+Class:ClassInfo:14:1373:ClassInfoTest.java:1380
+  Method:otherSetup():0
+  Method:ClassInfo(String in, int lineNo, String fromFile, int ci):0
+  Method:end(int lineNo):0
+  Method:copyClass():0
+  Method:addToTree(ClassList list, TreeStatus info, LinkedList nodeList):0
+  Method:ClassInfo():0
+  Method:ClassInfo(ParseTree in, ParseTree xx, String fromFile, Integer ci):0
+  Method:getTypeName(ParseTree in):0
+  Method:loadMethodText():0
+  Method:getClassOpen(String tab, boolean asQT):0
+  Method:getClassTestName():0
+  Method:getQTClassName():0
+  Method:replaceQt(String fx, String testDir):0
+  Method:resetQt(int lineNo, boolean softReset):0
+Class:ClassList:21:2151:ClassListTest.java:2158
+  Method:ClassList():0
+  Method:getClass(int index):0
+  Method:getFirstClass():0
+  Method:getLastClass():0
+  Method:findLastOpenClass():0
+  Method:findClassWithLine(int line):0
+  Method:findMethodWithLine(int line):0
+  Method:save(String filename):0
+  Method:findMethodForTest(TestInfo ti):0
+  Method:findClassWithMethod(MethodInfo mi):0
+  Method:findClassWithName(String in):0
+  Method:findClassWithChar(int in):0
+  Method:findMethodWithChar(int in):0
+  Method:output():0
+  Method:findQtClass(ClassInfo in):0
+  Method:getQTInstanceChain(ClassInfo origCI):0
+  Method:getQTInstances(ClassInfo origCI, boolean excludeInners):0
+  Method:outputQTClass(ClassInfo in, String qtFx, ClassInfo origCI):0
+  Method:outputQTClass(ClassInfo in, ClassList temp, String qtFx, ClassInfo origCI, boolean useQT):0
+  Method:sort():2
+    Test:sortTest_0:null:1:2100:0
+    Test:sortTest_1:null:2:2112:0
+  Method:swap(int i, int j):0
+Class:MethodInfo:36:3042:MethodInfoTest.java:3049
+  Method:getMethodSignature():0
+  Method:end(int lineNo):0
+  Method:setLines(String[] in):0
+  Method:setLines(String in):0
+  Method:getLines():0
+  Method:isSame(MethodInfo other):0
+  Method:getMethodText():0
+  Method:setTestState(int x):0
+  Method:setCompileState(int x):0
+  Method:getIconState():0
+  Method:stripTestName(String in):0
+  Method:getTestFirstLine():0
+  Method:extractParsedTests(ClassList cl):0
+  Method:getExtractedTest(int input):0
+  Method:getAllPaths(String[] meth):0
+  Method:getAllPaths(LineList in):0
+  Method:addToTree(ClassList list, TreeStatus info, LinkedList nodeList):0
+  Method:MethodInfo(ParseTree in, ParseTree info, String fromFile, Integer ci):0
+  Method:processRest(ParseTree in, String type, String name):0
+  Method:processParameters(ParseTree in):0
+  Method:getQualifiedNames(ParseTree in):0
+  Method:otherSetup():0
+  Method:quickTest(String[][] in, ClassInfo ci, ClassList cl, LangConfig lc):0
+  Method:processQuicktestResults(VarInfo[] outputs):0
+  Method:runQuicktest(String fName, LangConfig lc):0
+  Method:gatherAllInputs(ClassInfo ci):0
+  Method:reconcileInputs(String[][] in, VarInfo[] ins):0
+  Method:gatherAllOutputs(ClassList cl):0
+  Method:writeQuicktestClass(ClassInfo ci, VarInfo[] inputs, VarInfo[] outputs, LangConfig lc, ClassList cl):0
+  Method:writeQuicktestCtor(ClassInfo ci):0
+  Method:writeQuicktestMain(ClassInfo ci, VarInfo[] inputs, LangConfig lc, ClassList cl):0
+  Method:getFirstLine():0
+  Method:writeQuicktestFunction(ClassInfo ci):0
+  Method:getMappedParams(VarInfo[] in):0
+  Method:isEmptyCtor():0
+  Method:quicktestTesting(int a, int b):0
+Class:CodeNode:12:4869:MethodInfoTest.java:4876
+  Method:CodeNode():0
+  Method:CodeNode(String in):0
+  Method:CodeNode(LineInfo in):0
+  Method:addLineInfo(LineInfo in):0
+  Method:addChild(CodeNode node):0
+  Method:toString():0
+  Method:getShortString():0
+  Method:getObjectString():0
+  Method:getBlockData(LineInfo in):0
+  Method:getQTLines(FunctionTree in):0
+  Method:indentAll(CodeNode in, int startIndex, LineList ll):0
+  Method:outputQTCode(FunctionTree in):0
+Class:FunctionTree:34:12336:MethodInfoTest.java:12343
+  Method:FunctionTree(String[] meth):0
+  Method:FunctionTree(LineList in):0
+  Method:copyLineList(LineList in):0
+  Method:extractNodes(LinkedList codeParts):0
+  Method:linkTree(LineList in, CodeNode root, boolean trueRoot):0
+  Method:makeEmptyBranches(CodeNode root):0
+  Method:aggregateCases(CodeNode root):0
+  Method:setupSubnodes(CodeNode root):0
+  Method:markIndeces(CodeNode root):0
+  Method:linkTree(CodeNode[] temp):0
+  Method:makeEmptyElseNodes(CodeNode[] temp):0
+  Method:aggregateCases(CodeNode[] temp):0
+  Method:setupSubnodes(CodeNode[] temp):0
+  Method:processCodePath(LinkedList paths, String[] meth, int lineNo, int blockType, int parentLineNo):0
+  Method:getParsedCodePaths():0
+  Method:getParsedCodePath(int pathNum):0
+  Method:getParsedCodePath(LinkedList in):0
+  Method:getParsedCodePath(LineList[] in):0
+  Method:getAllSublines(LineList in, LineList out):0
+  Method:getParsedCodePath(LinkedList nodes, LineList lines, int index):0
+  Method:getCodePaths():0
+  Method:printPath():2
+    Test:printPathTest_0:null:1:10165:0
+    Test:printPathTest_1:null:2:10177:0
+  Method:buildString(LinkedList codePath, int parent, CodeNode parNode):0
+  Method:sumLeaves(CodeNode c):0
+  Method:levelTraverse(int level):0
+  Method:printTree(int debug):0
+  Method:getTreeInfo():0
+  Method:getQuicktest():0
+  Method:gatherAllNodes(boolean debugPrint):0
+  Method:getQTCode(CodeNode in):0
+  Method:gatherQTCode(LinkedList in):0
+  Method:calcBranchPath(CodeNode parent):0
+  Method:infixGather(CodeNode in, LinkedList ll):0
+  Method:calcLeaves():12
+    Test:calcLeavesTest_3:null:4:12190:0
+    Test:calcLeavesTest_7:null:8:12202:0
+    Test:calcLeavesTest_11:null:12:12214:0
+    Test:calcLeavesTest_0:null:1:12226:0
+    Test:calcLeavesTest_4:null:5:12238:0
+    Test:calcLeavesTest_10:null:11:12250:0
+    Test:calcLeavesTest_1:null:2:12262:0
+    Test:calcLeavesTest_2:null:3:12274:0
+    Test:calcLeavesTest_5:null:6:12286:0
+    Test:calcLeavesTest_6:null:7:12298:0
+    Test:calcLeavesTest_8:null:9:12310:0
+    Test:calcLeavesTest_9:null:10:12322:0
+Class:MethodList:14:1163:MethodListTest.java:1170
+  Method:MethodList(int index):0
+  Method:getMethod(int index):0
+  Method:getFirstMethod():0
+  Method:getLastMethod():0
+  Method:replace(int index, MethodInfo mi):0
+  Method:isTest(MethodInfo mi):0
+  Method:removeAllNonTestMethods():2
+    Test:removeAllNonTestMethodsTest_0:null:1:397:0
+    Test:removeAllNonTestMethodsTest_1:null:2:409:0
+  Method:stripTestName(String in):0
+  Method:getMethodNameIndex(String in):0
+  Method:getMethodForTest(String in):0
+  Method:getMethodWithName(String in):0
+  Method:getMethodWithSignature(String in):0
+  Method:countMethodsWithName(MethodInfo in):0
+  Method:output():1
+    Test:outputTest_0:null:1:1149:0
+Class:VarInfo:19:1220:VarInfoTest.java:1227
+  Method:VarInfo(String type, String name, int lineNo):0
+  Method:VarInfo(String type, String name, ParseTree rest, int ci, String mods):0
+  Method:copy():0
+  Method:countDimensions():0
+  Method:processDimensions():0
+  Method:addToTree(ClassList list, TreeStatus info, LinkedList nodeList):0
+  Method:processModifiers(ParseTree in):0
+  Method:processInitValue(ParseTree in):0
+  Method:VarInfo(ParseTree in, ParseTree xx, String fromfile, Integer classIndex):0
+  Method:processRest(ParseTree in):0
+  Method:setStartChar(int in):0
+  Method:setEndChar(int in):0
+  Method:setName(String name):0
+  Method:getName():0
+  Method:setType(String type):0
+  Method:getType():0
+  Method:getTypeWithDims():0
+  Method:getTypeSignature():0
+  Method:getModifiers(boolean withAccessModifiers):0
+Class:VarList:7:415:VarListTest.java:422
+  Method:getVar(int index):0
+  Method:getVarWithName(String in):0
+  Method:getFirstVar():0
+  Method:getLastVar():0
+  Method:output():1
+    Test:outputTest_0:null:1:210:0
+  Method:getAsParamList():0
+  Method:publicList(String tab):0
+Class:AssertionInfo:4:696:AssertionInfoTest.java:703
+  Method:AssertionInfo():0
+  Method:AssertionInfo(String line, int lineNo, ClassList progTree):0
+  Method:equals(AssertionInfo ai):0
+  Method:outputLine(String tab):0
+Class:AssertionList:9:1313:AssertionListTest.java:1320
+  Method:getAssertion(int index):0
+  Method:getFirstAssertion():0
+  Method:getLastAssertion():0
+  Method:hasReturnAssertion():0
+  Method:addAssertion(AssertionInfo newAssertion):0
+  Method:getListString():0
+  Method:elimDuplicates():5
+    Test:elimDuplicatesTest_3:null:4:546:0
+    Test:elimDuplicatesTest_2:null:3:558:0
+    Test:elimDuplicatesTest_4:null:5:570:0
+    Test:elimDuplicatesTest_0:null:1:582:0
+    Test:elimDuplicatesTest_1:null:2:594:0
+  Method:getReqClasses(String tab):0
+  Method:setupReqClasses():13
+    Test:setupReqClassesTest_3:null:4:1155:0
+    Test:setupReqClassesTest_7:null:8:1167:0
+    Test:setupReqClassesTest_11:null:12:1179:0
+    Test:setupReqClassesTest_2:null:3:1191:0
+    Test:setupReqClassesTest_4:null:5:1203:0
+    Test:setupReqClassesTest_10:null:11:1215:0
+    Test:setupReqClassesTest_12:null:13:1227:0
+    Test:setupReqClassesTest_0:null:1:1239:0
+    Test:setupReqClassesTest_1:null:2:1251:0
+    Test:setupReqClassesTest_5:null:6:1263:0
+    Test:setupReqClassesTest_6:null:7:1275:0
+    Test:setupReqClassesTest_8:null:9:1287:0
+    Test:setupReqClassesTest_9:null:10:1299:0
+Class:TestInfo:31:3696:TestInfoTest.java:3703
+  Method:TestInfo():1
+    Test:TestInfoTest_0:null:1:49:0
+  Method:clear():0
+  Method:TestInfo(String in, String name):0
+  Method:TestInfo(LineList in, String name, ClassList cl, MethodInfo mi, int index):0
+  Method:TestInfo(MethodInfo codeMi, String cn):0
+  Method:TestInfo(MethodInfo mi, LineList in):0
+  Method:getLineInputs(LineList in, ClassInfo ci, VarInfo[] params):0
+  Method:getMethodParams(MethodInfo mi):0
+  Method:getInputs(LineList in, ClassInfo ci, MethodInfo mi):0
+  Method:getTestScope(ClassList cl, MethodInfo mi):0
+  Method:findAssertions(LineList in, ClassList cl, MethodInfo mi):0
+  Method:getTestLines():0
+  Method:getIconState():0
+  Method:getNoveltyState():0
+  Method:getTestCode(String tab, ClassList cl):0
+  Method:getTestCode(String tab):0
+  Method:testMatch(String in, ClassList cl):0
+  Method:getInputValue(int num):0
+  Method:genMethodCall(String tab):0
+  Method:setTestCode(String in):0
+  Method:setCommentName(String in):0
+  Method:getCommentName():0
+  Method:getAssocMethod():0
+  Method:setAssocMethod(MethodInfo mi):0
+  Method:output():2
+    Test:outputTest_0:null:1:1993:0
+    Test:outputTest_1:null:2:2005:0
+  Method:getTestIndex():0
+  Method:isComplete():0
+  Method:gatherTestInfo(String in, MethodInfo mi, ClassList cl, int nLineInputs):0
+  Method:findClassName(String instanceName, String[] allLines):0
+  Method:varLookup(String in, MethodInfo mi, ClassList cl, int mode):0
+  Method:assertionFromTestLine(String in, MethodInfo mi, ClassList cl, String[] lines):0
+Class:TestList:9:547:TestListTest.java:554
+  Method:getTest(int index):0
+  Method:getNames():0
+  Method:getFirstTest():0
+  Method:getLastTest():0
+  Method:output():1
+    Test:outputTest_0:null:1:167:0
+  Method:copy():0
+  Method:compare(TestList in, boolean preserveOld):0
+  Method:findTestWithName(String in):0
+  Method:toArray():0
+Class:LineInfo:24:5113:LineInfoTest.java:5120
+  Method:makeStatic(ParseTree in):0
+  Method:LineInfo(ParseTree in, ParseTree info, String fromFile, Integer xx):0
+  Method:LineInfo(String in, int tabWidth):0
+  Method:LineInfo(String in, int startC, int tabDepth):0
+  Method:processDo(ClassList list, TreeStatus info):0
+  Method:processBranchType(ClassList list, TreeStatus info):0
+  Method:processTryBlock(ClassList list, TreeStatus info):0
+  Method:ternaryTest(ClassList list, TreeStatus info):0
+  Method:getTextTokens(ParseTree in, LinkedList tt):0
+  Method:getLineText(ParseTree in, boolean setTokens, String noWS):0
+  Method:addToTree(ClassList list, TreeStatus info, LinkedList nodeList):0
+  Method:toString():0
+  Method:getLIInformation():0
+  Method:outputPathCode(String noWS):0
+  Method:getLValue():0
+  Method:getRValue():0
+  Method:yieldsAssertion(ClassList cl, MethodInfo mi, VarList scope):0
+  Method:inScope(VarList scope, VarInfo vi, String fromClass, ClassList cl, ClassInfo ci):0
+  Method:isReturn():0
+  Method:isDo():0
+  Method:isBreak():0
+  Method:isCase():0
+  Method:LineInfo(LineInfo in):0
+  Method:getPostgroup():0
+Class:LineList:10:1418:LineListTest.java:1425
+  Method:getLine(int index):0
+  Method:toStrArray(String initTab, boolean usePathCode):0
+  Method:outputWTDepth(String initTab, boolean usePathCode):0
+  Method:getCommentList():0
+  Method:commentSub(LineList in):0
+  Method:setupPostgroup():0
+  Method:outputWTDepth(String initTab, RefInt depth, boolean usePathCode):0
+  Method:output(String tab, int outputType):0
+  Method:group():3
+    Test:groupTest_0:null:1:1250:0
+    Test:groupTest_1:null:2:1262:0
+    Test:groupTest_2:null:3:1274:0
+  Method:sort():2
+    Test:sortTest_0:null:1:1392:0
+    Test:sortTest_1:null:2:1404:0
+Class:Preamble:2:179:PreambleTest.java:186
+  Method:Preamble(ParseTree in, ParseTree xx, String fromFile, Integer classIndex):0
+  Method:addToTree(ClassList list, TreeStatus info, LinkedList nodeList):0
+Class:PreambleList:4:160:PreambleListTest.java:167
+  Method:getPreamble(int index):0
+  Method:listAll(String pre):0
+  Method:output():1
+    Test:outputTest_0:null:1:102:0
+  Method:dumpList():0
+Class:TreeStatus:7:180:TreeStatusTest.java:187
+  Method:TreeStatus():0
+  Method:getPreambles():0
+  Method:setPreambles(PreambleList preambles):0
+  Method:getCurrentClass():0
+  Method:setCurrentClass(ClassInfo currentClass):0
+  Method:getCurrentMethod():0
+  Method:setCurrentMethod(MethodInfo currentMethod):0
+Class:CodeMember:7:328:CodeMemberTest.java:335
+  Method:getStartChar():0
+  Method:getEndChar():0
+  Method:addToTree(ClassList list, TreeStatus info, LinkedList nodeList):0
+  Method:setStartChar(int startChar):0
+  Method:findFit(ParseTree in):0
+  Method:setEndChar(int endChar):0
+  Method:toString():0
+Class:BasicTerminal:2:58:BasicTerminalTest.java:65
+  Method:BasicTerminal(ParseTree in):0
+  Method:addToTree(ClassList list, TreeStatus info, LinkedList nodeList):0
+Class:BasicNonTerminal:2:51:BasicNonTerminalTest.java:58
+  Method:BasicNonTerminal(ParseTree in):0
+  Method:addToTree(ClassList list, TreeStatus info, LinkedList nodeList):0
+Class:MethodTextInfo:2:327:MethodTextInfoTest.java:334
+  Method:MethodTextInfo(ParseTree in, ParseTree info, String fromFile, Integer xx):0
+  Method:addToTree(ClassList list, TreeStatus info, LinkedList nodeList):0

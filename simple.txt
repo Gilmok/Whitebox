@@ -1,0 +1,13 @@
+import java.io.*;
+
+class aClass extends Integer implements ActionListener, MouseListener
+{
+   int abc;
+   int def;
+   
+   int doNothing()
+   {
+      abc = def;
+      return abc;
+   }
+}

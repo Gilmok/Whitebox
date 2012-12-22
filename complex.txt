@@ -1,0 +1,79 @@
+import java.io.*;
+
+class aClass extends Integer implements ActionListener, MouseListener
+{
+   int abc;
+   int def;
+   
+   int doNothing()
+   {
+      abc = def;
+      //if else test
+      if(abc == def)
+      	def = 1;
+      else
+      	def = 2; //2
+      //switch test	
+      switch(abc)
+      {
+      	case 1:
+      		def = -1;
+      		break;
+      	case 2:
+      		def = -2;
+      		break;
+      	case 3:
+      		def = -3;
+      		switch (abc)
+      		{
+      			case 2:
+      				def = 1;
+      				break;
+      		}
+      	default:
+      		def = -4;  //4
+      }
+      //nested
+      if(abc == def)
+      {
+      	def = 5;
+      }
+      else if(abc != def)
+      {
+        def = 6;
+      }
+      else if(abc > def)
+      {
+        def = 7;
+      }
+      else if(abc < def)
+      {
+        def = 8;
+      }  //5
+      //ternary
+      abc == 0 ? def = 9 : def = 10; //2 
+      //try
+      try
+      {
+      	abc = 1;
+      	def = 11;
+      }
+      catch(Exception e)
+      {
+      	abc = 2; //2
+      }
+      return abc;
+      for(abc = 1; abc < 2; abc++)
+      {
+         def++;
+      }
+      {
+         int x;
+         int y;
+         x = y++;
+         if(x == 0)
+         	return;
+      }
+   }
+}
+// 2 * 4 * 4 * 2 = 64

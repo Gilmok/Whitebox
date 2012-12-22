@@ -1,0 +1,257 @@
+getTreeCellRendererComponent: 2
+[#1 Type:0 Paths:2]
+[#2(1) Type:-1 Paths:2]
+[#3(2) Type:1 Paths:1][#4(2) Type:2 Paths:1]
+=====================
+getTestIcon: 1
+[#1 Type:0 Paths:1]
+=====================
+getTestIcon: 1
+[#1 Type:0 Paths:1]
+=====================
+StringRef: 1
+[#1 Type:0 Paths:1]
+=====================
+set: 1
+[#1 Type:0 Paths:1]
+=====================
+get: 2
+[#1 Type:0 Paths:2]
+[#2(1) Type:-1 Paths:2]
+[#3(2) Type:1 Paths:1][#4(2) Type:2 Paths:1]
+=====================
+isAbsolutePath: 6
+[#1 Type:0 Paths:6]
+[#2(1) Type:-1 Paths:2][#3(1) Type:-1 Paths:3]
+[#4(2) Type:1 Paths:1][#5(2) Type:2 Paths:1][#6(3) Type:1 Paths:2][#7(3) Type:2 Paths:1]
+[#8(6) Type:-1 Paths:2]
+[#9(8) Type:1 Paths:1][#10(8) Type:2 Paths:1]
+=====================
+setAsAbsolute: 1
+[#1 Type:0 Paths:1]
+=====================
+WhiteboxUI: 1
+[#1 Type:0 Paths:1]
+=====================
+setupPathLabels: 4
+[#1 Type:0 Paths:4]
+[#2(1) Type:-1 Paths:2][#3(1) Type:-1 Paths:2]
+[#4(2) Type:1 Paths:1][#5(2) Type:2 Paths:1][#6(3) Type:1 Paths:1][#7(3) Type:2 Paths:1]
+=====================
+expandTree: 1
+[#1 Type:0 Paths:1]
+=====================
+loadSettings: 1
+[#1 Type:0 Paths:1]
+=====================
+loadProgram: 1
+[#1 Type:0 Paths:1]
+=====================
+updateTests: 12
+[#1 Type:0 Paths:12]
+[#2(1) Type:-1 Paths:2][#3(1) Type:-1 Paths:3][#4(1) Type:-1 Paths:2]
+[#5(2) Type:1 Paths:1][#6(2) Type:2 Paths:1][#7(3) Type:1 Paths:1][#8(3) Type:2 Paths:2][#9(4) Type:1 Paths:1][#10(4) Type:2 Paths:1]
+[#11(8) Type:-1 Paths:2]
+[#12(11) Type:1 Paths:1][#13(11) Type:2 Paths:1]
+=====================
+getTests: 1
+[#1 Type:0 Paths:1]
+=====================
+getFileList: 3
+[#1 Type:0 Paths:3]
+[#2(1) Type:-1 Paths:3]
+[#3(2) Type:1 Paths:2][#4(2) Type:2 Paths:1]
+[#5(3) Type:-1 Paths:2]
+[#6(5) Type:1 Paths:1][#7(5) Type:2 Paths:1]
+=====================
+fillAllOutput: 1
+[#1 Type:0 Paths:1]
+=====================
+fillTree: 2
+[#1 Type:0 Paths:2]
+[#2(1) Type:-1 Paths:2]
+[#3(2) Type:1 Paths:1][#4(2) Type:2 Paths:1]
+=====================
+fillTestConfig: 8
+[#1 Type:0 Paths:8]
+[#2(1) Type:-1 Paths:2][#3(1) Type:-1 Paths:2][#4(1) Type:-1 Paths:2]
+[#5(2) Type:1 Paths:1][#6(2) Type:2 Paths:1][#7(3) Type:1 Paths:1][#8(3) Type:2 Paths:1][#9(4) Type:1 Paths:1][#10(4) Type:2 Paths:1]
+=====================
+openWbcfile: 1
+[#1 Type:0 Paths:1]
+=====================
+loadTestConfig: 1
+[#1 Type:0 Paths:1]
+=====================
+saveTestConfig: 1
+[#1 Type:0 Paths:1]
+=====================
+saveTests: 2
+[#1 Type:0 Paths:2]
+[#2(1) Type:-1 Paths:2]
+[#3(2) Type:1 Paths:1][#4(2) Type:2 Paths:1]
+=====================
+fillErrors: 1
+[#1 Type:0 Paths:1]
+=====================
+fillSysout: 1
+[#1 Type:0 Paths:1]
+=====================
+valueChanged: 6
+[#1 Type:0 Paths:6]
+[#2(1) Type:-1 Paths:2][#3(1) Type:-1 Paths:3]
+[#4(2) Type:1 Paths:1][#5(2) Type:2 Paths:1][#6(3) Type:1 Paths:1][#7(3) Type:2 Paths:2]
+[#8(7) Type:-1 Paths:2]
+[#9(8) Type:1 Paths:1][#10(8) Type:2 Paths:1]
+=====================
+findObjectInTree: 2
+[#1 Type:0 Paths:2]
+[#2(1) Type:-1 Paths:2]
+[#3(2) Type:1 Paths:1][#4(2) Type:2 Paths:1]
+=====================
+actionPerformed: 24
+[#1 Type:0 Paths:24]
+[#2(1) Type:-1 Paths:24]
+[#3(2) Type:1 Paths:6][#4(2) Type:2 Paths:18]
+[#5(3) Type:-1 Paths:2][#6(3) Type:-1 Paths:3][#7(4) Type:-1 Paths:18]
+[#8(5) Type:1 Paths:1][#9(5) Type:2 Paths:1][#10(6) Type:1 Paths:1][#11(6) Type:2 Paths:2][#12(7) Type:1 Paths:1][#13(7) Type:2 Paths:17]
+[#14(11) Type:-1 Paths:2][#15(13) Type:-1 Paths:17]
+[#16(14) Type:1 Paths:1][#17(14) Type:2 Paths:1][#18(15) Type:1 Paths:1][#19(15) Type:2 Paths:16]
+[#20(19) Type:-1 Paths:16]
+[#21(20) Type:1 Paths:1][#22(20) Type:2 Paths:15]
+[#23(22) Type:-1 Paths:15]
+[#24(23) Type:1 Paths:1][#25(23) Type:2 Paths:14]
+[#26(25) Type:-1 Paths:14]
+[#27(26) Type:1 Paths:1][#28(26) Type:2 Paths:13]
+[#29(28) Type:-1 Paths:13]
+[#30(29) Type:1 Paths:1][#31(29) Type:2 Paths:12]
+[#32(31) Type:-1 Paths:12]
+[#33(32) Type:1 Paths:1][#34(32) Type:2 Paths:11]
+[#35(34) Type:-1 Paths:11]
+[#36(35) Type:1 Paths:4][#37(35) Type:2 Paths:7]
+[#38(36) Type:-1 Paths:2][#39(36) Type:-1 Paths:2][#40(37) Type:-1 Paths:7]
+[#41(38) Type:1 Paths:1][#42(38) Type:2 Paths:1][#43(39) Type:1 Paths:1][#44(39) Type:2 Paths:1][#45(40) Type:1 Paths:4][#46(40) Type:2 Paths:3]
+[#47(45) Type:-1 Paths:4][#48(46) Type:-1 Paths:3]
+[#49(47) Type:1 Paths:2][#50(47) Type:2 Paths:2][#51(48) Type:1 Paths:2][#52(48) Type:2 Paths:1]
+[#53(49) Type:-1 Paths:2][#54(50) Type:-1 Paths:2][#55(51) Type:-1 Paths:2]
+[#56(53) Type:1 Paths:1][#57(53) Type:2 Paths:1][#58(54) Type:1 Paths:1][#59(54) Type:2 Paths:1][#60(55) Type:1 Paths:1][#61(55) Type:2 Paths:1]
+=====================
+textValueChanged: 1
+[#1 Type:0 Paths:1]
+=====================
+dumpTempTest: 2
+[#1 Type:0 Paths:2]
+[#2(1) Type:-1 Paths:2]
+[#3(2) Type:1 Paths:1][#4(2) Type:2 Paths:1]
+=====================
+compileTests: 1
+[#1 Type:0 Paths:1]
+=====================
+createTestMain: 1
+[#1 Type:0 Paths:1]
+=====================
+dumpTestClass: 1
+[#1 Type:0 Paths:1]
+=====================
+runTests: 1
+[#1 Type:0 Paths:1]
+=====================
+setupMenus: 1
+[#1 Type:0 Paths:1]
+=====================
+selectPatternToOpen: 1
+[#1 Type:0 Paths:1]
+=====================
+selectFileToOpen: 2
+[#1 Type:0 Paths:2]
+[#2(1) Type:-1 Paths:2]
+[#3(2) Type:1 Paths:1][#4(2) Type:2 Paths:1]
+=====================
+selectFileToSave: 2
+[#1 Type:0 Paths:2]
+[#2(1) Type:-1 Paths:2]
+[#3(2) Type:1 Paths:1][#4(2) Type:2 Paths:1]
+=====================
+getSelectedTI: 1
+[#1 Type:0 Paths:1]
+=====================
+getSelectedMI: 1
+[#1 Type:0 Paths:1]
+=====================
+getSelectedCI: 2
+[#1 Type:0 Paths:2]
+[#2(1) Type:-1 Paths:2]
+[#3(2) Type:1 Paths:1][#4(2) Type:2 Paths:1]
+=====================
+FunctionViewPanel: 1
+[#1 Type:0 Paths:1]
+=====================
+FunctionViewPanel: 1
+[#1 Type:0 Paths:1]
+=====================
+FunctionViewPanel: 1
+[#1 Type:0 Paths:1]
+=====================
+setup: 1
+[#1 Type:0 Paths:1]
+=====================
+setup: 1
+[#1 Type:0 Paths:1]
+=====================
+setup2: 2
+[#1 Type:0 Paths:2]
+[#2(1) Type:-1 Paths:2]
+[#3(2) Type:1 Paths:1][#4(2) Type:2 Paths:1]
+=====================
+paintComponent: 1
+[#1 Type:0 Paths:1]
+=====================
+setViewSize: 1
+[#1 Type:0 Paths:1]
+=====================
+getFunctionName: 1
+[#1 Type:0 Paths:1]
+=====================
+getPreferredScrollableViewportSize: 1
+[#1 Type:0 Paths:1]
+=====================
+getScrollableBlockIncrement: 1
+[#1 Type:0 Paths:1]
+=====================
+getScrollableTracksViewportHeight: 1
+[#1 Type:0 Paths:1]
+=====================
+getScrollableTracksViewportWidth: 1
+[#1 Type:0 Paths:1]
+=====================
+getScrollableUnitIncrement: 1
+[#1 Type:0 Paths:1]
+=====================
+FileSelectorBox: 1
+[#1 Type:0 Paths:1]
+=====================
+FileSelectorBox: 1
+[#1 Type:0 Paths:1]
+=====================
+setup: 1
+[#1 Type:0 Paths:1]
+=====================
+getPattern: 1
+[#1 Type:0 Paths:1]
+=====================
+getPath: 1
+[#1 Type:0 Paths:1]
+=====================
+actionPerformed: 3
+[#1 Type:0 Paths:3]
+[#2(1) Type:-1 Paths:3]
+[#3(2) Type:1 Paths:2][#4(2) Type:2 Paths:1]
+[#5(3) Type:-1 Paths:2]
+[#6(5) Type:1 Paths:1][#7(5) Type:2 Paths:1]
+=====================
+FunctionViewUI: 1
+[#1 Type:0 Paths:1]
+=====================
+main: 1
+[#1 Type:0 Paths:1]
+=====================

@@ -1,0 +1,163 @@
+
+[TestFixture]
+class WhiteboxUITests extends WhiteboxUI
+{
+   [Test]
+   public void WhiteboxUICtor1Test()
+   {
+      MockWhiteboxUI testClass = new MockWhiteboxUI();
+      assert.areEqual(testClass.testTree,"");
+      assert.areEqual(testClass.testView,"");
+   }
+   [Test]
+   public void loadSettingsTest()
+   {
+      WhiteboxUI testClass0 = new MockWhiteboxUI()
+;      loadSettings();
+      assert.areEqual(testClass0.classTestAppend,"");
+      assert.areEqual(testClass0.methodTestAppend,"");
+   }
+   [Test]
+   public void makeTestsTest()
+   {
+   }
+   [Test]
+   public void getTestsTest()
+   {
+      ClassList rtnVal = getTests(01);
+      assert.areEqual(rtnVal,"");
+   }
+   [Test]
+   public void getFileListTest()
+   {
+      String[] rtnVal = getFileList(01);
+      assert.areEqual(rtnVal,"");
+   }
+   [Test]
+   public void fillTreeTest()
+   {
+   }
+   [Test]
+   public void fillTestConfigTest()
+   {
+   }
+   [Test]
+   public void fillErrorsTest()
+   {
+   }
+   [Test]
+   public void fillFunctionTest()
+   {
+      WhiteboxUI testClass0 = new MockWhiteboxUI()
+;      fillFunction(0);
+      assert.areEqual(testClass0.functionScroll,"");
+   }
+   [Test]
+   public void fillSysoutTest()
+   {
+   }
+   [Test]
+   public void makeOutputHtmlTest()
+   {
+      String rtnVal = makeOutputHtml();
+      assert.areEqual(rtnVal,"");
+   }
+}
+
+[TestFixture]
+class FunctionViewPanelTests extends FunctionViewPanel
+{
+   [Test]
+   public void FunctionViewPanelCtor1Test()
+   {
+   }
+   [Test]
+   public void FunctionViewPanelCtor2Test()
+   {
+   }
+   [Test]
+   public void setupTest()
+   {
+      FunctionViewPanel testClass0 = new MockFunctionViewPanel()
+;      setup(0);
+      assert.areEqual(testClass0.methodInfo,"");
+      assert.areEqual(testClass0.mFont,"");
+      assert.areEqual(testClass0.fm,"");
+      assert.areEqual(testClass0.fontHeight,"");
+      assert.areEqual(testClass0.fontWidth,"");
+      assert.areEqual(testClass0.boxWidth,"");
+      assert.areEqual(testClass0.boxHeight,"");
+   }
+   [Test]
+   public void paintComponentTest()
+   {
+   }
+   [Test]
+   public void setViewSizeTest()
+   {
+      FunctionViewPanel testClass0 = new MockFunctionViewPanel()
+;      setViewSize(01);
+      assert.areEqual(testClass0.viewWidth,"");
+      assert.areEqual(testClass0.viewHeight,"");
+   }
+   [Test]
+   public void getFunctionNameTest()
+   {
+      String rtnVal = getFunctionName();
+      assert.areEqual(rtnVal,"");
+   }
+   [Test]
+   public void getPreferredScrollableViewportSizeTest()
+   {
+      Dimension rtnVal = getPreferredScrollableViewportSize();
+      assert.areEqual(rtnVal,"");
+   }
+   [Test]
+   public void getScrollableBlockIncrementTest()
+   {
+      int rtnVal = getScrollableBlockIncrement(012);
+      assert.areEqual(rtnVal,"");
+   }
+   [Test]
+   public void getScrollableTracksViewportHeightTest()
+   {
+      boolean rtnVal = getScrollableTracksViewportHeight();
+      assert.areEqual(rtnVal,"");
+   }
+   [Test]
+   public void getScrollableTracksViewportWidthTest()
+   {
+      boolean rtnVal = getScrollableTracksViewportWidth();
+      assert.areEqual(rtnVal,"");
+   }
+   [Test]
+   public void getScrollableUnitIncrementTest()
+   {
+      int rtnVal = getScrollableUnitIncrement(012);
+      assert.areEqual(rtnVal,"");
+   }
+}
+
+[TestFixture]
+class GuiTestTests extends GuiTest
+{
+   [Test]
+   public void GuiTestCtor1Test()
+   {
+      MockGuiTest testClass = new MockGuiTest(0);
+      assert.areEqual(testClass.pne,"");
+      assert.areEqual(testClass.txt,"");
+      assert.areEqual(testClass.spne,"");
+      assert.areEqual(testClass.panel,"");
+   }
+}
+
+[TestFixture]
+class WhiteboxGUITests extends WhiteboxGUI
+{
+   [Test]
+   public void mainTest()
+   {
+   }
+}
+

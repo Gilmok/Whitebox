@@ -1,0 +1,25 @@
+   VarInfo(String in, int lineNo)
+   {
+      startLine = lineNo;
+      endLine = lineNo;
+      
+      access = WhiteboxUtils.getAccessLevel(in);
+      in = WhiteboxUtils.removeAccessModifiers(in);
+      
+      String temp = in;
+      try
+      {
+         temp = temp.substring(0, temp.indexOf(';'));
+         temp = temp.substring(0, temp.indexOf('='));
+      }
+      catch(StringIndexOutOfBoundsException ex)
+      {}
+      temp.trim();
+      
+      String[] vardecl = temp.split(" ");
+      type = vardecl[0];
+      name = vardecl[1];
+      
+      nDimensions = countDimensions();
+      
+   }

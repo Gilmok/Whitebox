@@ -1,0 +1,158 @@
+private synchronized LinkedList processCodePath(LinkedList paths, String[] meth, int lineNo, int blockType, int parentLineNo)
+	   {
+		  //add the new entry
+		  
+		  //paths.add(new String("|L:" + lineNo + "|P:" + parentLineNo +"|\n"));
+		  String currPath = new String("BT:" + blockType + "|L:" + pcpLineNo + "|R:" + lineNo + "|P:" + parentLineNo +"|\n");
+		  String tokens[] = {"else", "if(", "switch(", "case ", "default:"/*, "do", "while(", "for("*/};
+		  boolean endedBlock = false;
+		  String line;
+		  int branchPos = -1;
+		  int blockDepth = 0;
+		  int relativeLine = 0;
+		  int parLine = pcpLineNo;
+		  int i = 0;
+		  
+		  while(pcpLineNo < meth.length)
+		  {
+			 i = pcpLineNo;
+			 line = new String(meth[i]);
+			 line = WhiteboxUtils.removeNonCode(line, true);
+			 int foundNum = -1;
+			 int ifEnd = 0;
+			 //line = line.trim();
+			 //if you start a new block, process it
+			 for(int j = 0; j < tokens.length; j++)
+			 {
+				 branchPos = line.indexOf(tokens[j]);
+				 if(branchPos > 0 && line.charAt(branchPos - 1) >= '0')
+					 continue;
+				 else if(branchPos > -1)
+				 {
+					 foundNum = j;
+					 break;
+				 }
+			 }
+			 
+			 switch(foundNum)
+			 {
+			 case 0:  //else
+				 ifEnd = branchPos + 4;
+				 meth[i] = meth[i].substring(0, branchPos) + "/*else*/" + meth[i].substring(ifEnd);
+				 relativeLine--;
+				 processCodePath(paths, meth, relativeLine, ELSE, parLine);
+				 relativeLine++;
+				 break;
+			 case 1:  //if
+				 ifEnd = WhiteboxUtils.findClosingParen(line, branchPos + 4) + 1;
+				 String condition = meth[i].substring(branchPos, ifEnd);
+				 condition = condition.substring(condition.indexOf("if(") + 2);
+				 meth[i] = meth[i].substring(0, branchPos) + "/* because" + condition + " */" + meth[i].substring(ifEnd);
+				 processCodePath(paths, meth, relativeLine, IF, parLine);
+				 relativeLine++;
+				 break;
+			 case 2:  //switch
+				 ifEnd = WhiteboxUtils.findClosingParen(line, branchPos + 8) + 1;
+				 meth[i] = meth[i].substring(0, branchPos) + "/* switch on " + meth[i].substring(branchPos + 7, ifEnd) + " */" + meth[i].substring(ifEnd);
+				 processCodePath(paths, meth, relativeLine, SWITCH, parLine);
+				 relativeLine++;
+				 break;
+			 case 3:  //case
+				 if(blockType == 4)  // don't process cases within cases
+				 {
+					 paths.add(currPath);
+					 return paths;
+				 }
+				 else
+				 {
+					 ifEnd = line.indexOf(":", branchPos + 6) + 1;
+					 int caseEnd = line.indexOf("case ") + 5;
+					 meth[i] = meth[i].substring(0, branchPos) + "/* value is " + meth[i].substring(caseEnd, ifEnd)  + " */" + meth[i].substring(ifEnd);
+					 relativeLine = 2;
+					 processCodePath(paths, meth, relativeLine, CASE, parLine);
+					 relativeLine++;
+				 }
+				 break;
+			 case 4:  //"default"
+				 if(blockType == 4)  // don't process cases within cases
+				 {
+					 paths.add(currPath);
+					 return paths;
+				 }
+				 else
+				 {
+					 ifEnd = line.indexOf(":", branchPos + 7) + 1;
+					 meth[i] = meth[i].substring(0, branchPos) + meth[i].substring(ifEnd);
+					 relativeLine = 2;
+					 processCodePath(paths, meth, relativeLine, DEFAULT, parLine);
+					 relativeLine++;
+				 }
+				 break;
+			 case -1:  //nothing
+				 switch(blockType)
+				 {
+				    case 0:
+				       if(line.indexOf("}") >= 0)
+				       {
+				    	   if(blockDepth == 0)
+				    	      endedBlock = true;
+				    	   else
+				    		  blockDepth--;
+				       }
+				       else if(line.indexOf("{") >= 0)
+				    	   blockDepth++;
+				 	   break;
+				    
+				 	case IF:
+				 	case ELSE:
+				 	   if(line.indexOf("{") >= 0)
+				 	   {
+				 	      blockType = 0;
+				 	   }
+				 	   else if(line.trim().endsWith(";"))
+				 		  endedBlock = true;
+				 	   else if(line.indexOf("}") >= 0)
+				 	   {
+				 		   //truncated if-else: just return the path without adding anything
+				 		   //or moving forward to the next line
+				 		   paths.add(currPath);
+				 		   return paths;
+				 	   }
+				 	   break;
+				 	
+				 	case SWITCH:
+				 	   if(line.indexOf("}") >= 0)
+				 		   endedBlock = true;
+				 	   break;
+				    
+				 	case CASE:
+				 	case DEFAULT:
+				 		if(line.indexOf("{") >= 0)
+				 		{
+					 	   blockType = 0;
+					 	   break;
+				 		}
+					 	else if(line.indexOf("break;") >= 0)
+					 	   endedBlock = true;
+				 		break;
+				 }
+				 currPath += meth[i] + "\n";
+				 //when you're done you're done
+				 if(endedBlock)
+				 {
+					 paths.add(currPath);
+					 pcpLineNo++;
+					 return paths;
+				 }
+				 else
+				 {
+					 relativeLine++;
+					 pcpLineNo++;
+				 }
+				 break;
+			 }
+		  }
+		//if you end a block, add the block to the list and return
+		  paths.add(currPath);
+		  return paths;
+	   }

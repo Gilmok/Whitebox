@@ -1,0 +1,23 @@
+javac
+java JavaTEA
+
+packageDeclaration:Preamble:0
+importDeclaration:Preamble:0
+normalClassDeclaration:ClassInfo:2
+genericMethodOrConstructorDecl:MethodInfo:2
+constructorDeclaratorRest:MethodInfo:2
+methodDeclaration:MethodInfo:2
+fieldDeclaration:VarInfo:2
+voidMethodDeclaratorRest:MethodInfo:2
+blockStatement:LineInfo:2
+classBodyDeclaration:MethodTextInfo:2
+
+boolean
+char
+byte
+short
+int
+long
+float
+double
+

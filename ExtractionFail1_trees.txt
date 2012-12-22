@@ -1,0 +1,15 @@
+normal: 2
+[#1 Type:0 Paths:2]
+[#2(1) Type:-1 Paths:2]
+[#3(2) Type:1 Paths:1][#4(2) Type:2 Paths:1]
+=====================
+camelTry: 1
+[#1 Type:0 Paths:1]
+=====================
+mHexLiteral: 48
+[#1 Type:0 Paths:48]
+[#2(1) Type:-1 Paths:2][#3(1) Type:-1 Paths:2][#4(1) Type:-1 Paths:3][#5(1) Type:-1 Paths:2][#6(1) Type:-1 Paths:2]
+[#7(2) Type:1 Paths:1][#8(2) Type:2 Paths:1][#9(3) Type:1 Paths:1][#10(3) Type:2 Paths:1][#11(4) Type:4 Paths:1][#12(4) Type:5 Paths:2][#13(5) Type:1 Paths:1][#14(5) Type:2 Paths:1][#15(6) Type:4 Paths:1][#16(6) Type:5 Paths:1]
+[#17(12) Type:-1 Paths:2]
+[#18(17) Type:1 Paths:1][#19(17) Type:2 Paths:1]
+=====================

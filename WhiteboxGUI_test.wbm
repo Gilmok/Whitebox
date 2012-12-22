@@ -1,0 +1,201 @@
+Class:TestCellRenderer:3 methods
+   Method:getTreeCellRendererComponent:2 tests
+      Test:null:null
+      Test:null:null
+   Method:getTestIcon:1 tests
+      Test:null:null
+   Method:getTestIcon:1 tests
+      Test:null:null
+Class:StringRef:5 methods
+   Method:StringRef:1 tests
+      Test:null:null
+   Method:set:1 tests
+      Test:null:null
+   Method:get:2 tests
+      Test:null:null
+      Test:null:null
+   Method:isAbsolutePath:2 tests
+      Test:null:null
+      Test:null:null
+   Method:setAsAbsolute:1 tests
+      Test:null:null
+Class:WhiteboxUI:33 methods
+   Method:WhiteboxUI:1 tests
+      Test:null:null
+   Method:setupPathLabels:1 tests
+      Test:null:null
+   Method:expandTree:1 tests
+      Test:null:null
+   Method:loadSettings:1 tests
+      Test:null:null
+   Method:loadProgram:1 tests
+      Test:null:null
+   Method:updateTests:16 tests
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+   Method:getTests:1 tests
+      Test:null:null
+   Method:getFileList:2 tests
+      Test:null:null
+      Test:null:null
+   Method:fillAllOutput:1 tests
+      Test:null:null
+   Method:fillTree:2 tests
+      Test:null:null
+      Test:null:null
+   Method:fillTestConfig:8 tests
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+   Method:openWbcfile:1 tests
+      Test:null:null
+   Method:loadTestConfig:1 tests
+      Test:null:null
+   Method:saveTestConfig:1 tests
+      Test:null:null
+   Method:saveTests:2 tests
+      Test:null:null
+      Test:null:null
+   Method:fillErrors:1 tests
+      Test:null:null
+   Method:fillSysout:1 tests
+      Test:null:null
+   Method:valueChanged:2 tests
+      Test:null:null
+      Test:null:null
+   Method:findObjectInTree:1 tests
+      Test:null:null
+   Method:actionPerformed:32 tests
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+   Method:textValueChanged:1 tests
+      Test:null:null
+   Method:dumpTempTest:2 tests
+      Test:null:null
+      Test:null:null
+   Method:compileTests:1 tests
+      Test:null:null
+   Method:createTestMain:1 tests
+      Test:null:null
+   Method:dumpTestClass:1 tests
+      Test:null:null
+   Method:runTests:1 tests
+      Test:null:null
+   Method:setupMenus:1 tests
+      Test:null:null
+   Method:selectPatternToOpen:1 tests
+      Test:null:null
+   Method:selectFileToOpen:2 tests
+      Test:null:null
+      Test:null:null
+   Method:selectFileToSave:2 tests
+      Test:null:null
+      Test:null:null
+   Method:getSelectedTI:1 tests
+      Test:null:null
+   Method:getSelectedMI:1 tests
+      Test:null:null
+   Method:getSelectedCI:2 tests
+      Test:null:null
+      Test:null:null
+Class:FunctionViewPanel:14 methods
+   Method:FunctionViewPanel:1 tests
+      Test:null:null
+   Method:FunctionViewPanel:1 tests
+      Test:null:null
+   Method:FunctionViewPanel:1 tests
+      Test:null:null
+   Method:setup:1 tests
+      Test:null:null
+   Method:setup:1 tests
+      Test:null:null
+   Method:setup2:2 tests
+      Test:null:null
+      Test:null:null
+   Method:paintComponent:1 tests
+      Test:null:null
+   Method:setViewSize:1 tests
+      Test:null:null
+   Method:getFunctionName:1 tests
+      Test:null:null
+   Method:getPreferredScrollableViewportSize:1 tests
+      Test:null:null
+   Method:getScrollableBlockIncrement:1 tests
+      Test:null:null
+   Method:getScrollableTracksViewportHeight:1 tests
+      Test:null:null
+   Method:getScrollableTracksViewportWidth:1 tests
+      Test:null:null
+   Method:getScrollableUnitIncrement:1 tests
+      Test:null:null
+Class:FileSelectorBox:6 methods
+   Method:FileSelectorBox:1 tests
+      Test:null:null
+   Method:FileSelectorBox:1 tests
+      Test:null:null
+   Method:setup:1 tests
+      Test:null:null
+   Method:getPattern:1 tests
+      Test:null:null
+   Method:getPath:1 tests
+      Test:null:null
+   Method:actionPerformed:3 tests
+      Test:null:null
+      Test:null:null
+      Test:null:null
+Class:FunctionViewUI:1 methods
+   Method:FunctionViewUI:1 tests
+      Test:null:null
+Class:WhiteboxGUI:1 methods
+   Method:main:1 tests
+      Test:null:null
+

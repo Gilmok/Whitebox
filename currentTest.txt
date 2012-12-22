@@ -1,0 +1,40 @@
+import java.io.*;
+
+class aClass extends Integer implements ActionListener, MouseListener
+{
+   int abc;
+   int def;
+   
+   int doNothing()
+   {	  
+      int x;
+      int y;
+      int n;
+      if(x == 0)
+      {
+	  y = 0;
+	  n = 0;
+	  for(int i = 0; i < n; i++)
+	  {
+	     x = 0;
+	     n = 0;
+	     y = 0;
+	     if(n > 0)
+	      	return;
+	     else
+	     {
+	      	for(int j = 0; j < x; j++)
+	      	{
+		   n++;
+	  	}
+	     }
+	  }
+          return;
+      }
+      else if(y == 0)
+         y++;
+      else
+	 n++;
+      return;
+   }
+}

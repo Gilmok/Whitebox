@@ -1,0 +1,86 @@
+Class:WhiteboxProgram:26 methods
+   Method:WhiteboxProgram:1 tests
+      Test:null:null
+   Method:generateSynTree:4 tests
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+   Method:groupMethodLine:1 tests
+      Test:null:null
+   Method:findAssertionsAndTests:1 tests
+      Test:null:null
+   Method:generateTests:2 tests
+      Test:null:null
+      Test:null:null
+   Method:saveTests:1 tests
+      Test:null:null
+   Method:getClassList:1 tests
+      Test:null:null
+   Method:getSyntaxTree:1 tests
+      Test:null:null
+   Method:getTestSynTree:1 tests
+      Test:null:null
+   Method:loadFile:2 tests
+      Test:null:null
+      Test:null:null
+   Method:dumpTests:2 tests
+      Test:null:null
+      Test:null:null
+   Method:getTestManifest:1 tests
+      Test:null:null
+   Method:generateTest:16 tests
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+   Method:outputFile:1 tests
+      Test:null:null
+   Method:isClassDecl:2 tests
+      Test:null:null
+      Test:null:null
+   Method:isMethodDecl:2 tests
+      Test:null:null
+      Test:null:null
+   Method:isConstrDecl:2 tests
+      Test:null:null
+      Test:null:null
+   Method:isVarDecl:2 tests
+      Test:null:null
+      Test:null:null
+   Method:beginsBlock:2 tests
+      Test:null:null
+      Test:null:null
+   Method:endsBlock:2 tests
+      Test:null:null
+      Test:null:null
+   Method:beginsCommentBlock:2 tests
+      Test:null:null
+      Test:null:null
+   Method:containsCommentBlock:2 tests
+      Test:null:null
+      Test:null:null
+   Method:endsCommentBlock:2 tests
+      Test:null:null
+      Test:null:null
+   Method:yieldsAssertion:3 tests
+      Test:null:null
+      Test:null:null
+      Test:null:null
+   Method:yieldsNewTest:1 tests
+      Test:null:null
+   Method:main:1 tests
+      Test:null:null
+

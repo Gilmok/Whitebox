@@ -1,0 +1,23 @@
+public void functest()
+{
+   if(a)
+   1;
+   else
+   {
+   1;
+   2;
+   }
+   if(c)
+   {
+   1;
+   2;
+   3;
+   }
+   else if(d)
+   {
+   1;
+   2;
+   3;
+   4;
+   }
+}

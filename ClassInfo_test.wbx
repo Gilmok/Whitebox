@@ -1,0 +1,282 @@
+
+[TestFixture]
+class ClassInfoTests extends ClassInfo
+{
+   [Test]
+   public void ClassInfoCtor1Test()
+   {
+      MockClassInfo testClass = new MockClassInfo(01);
+      assert.areEqual(testClass.startLine,"");
+      assert.areEqual(testClass.endLine,"");
+      assert.areEqual(testClass.access,"");
+      assert.areEqual(testClass.className,"");
+      assert.areEqual(testClass.className,"");
+      assert.areEqual(testClass.vars,"");
+      assert.areEqual(testClass.methods,"");
+   }
+   [Test]
+   public void endTest()
+   {
+      ClassInfo testClass0 = new MockClassInfo()
+;      end(0);
+      assert.areEqual(testClass0.endLine,"");
+   }
+}
+
+[TestFixture]
+class ClassListTests extends ClassList
+{
+   [Test]
+   public void getClassTest()
+   {
+      ClassInfo rtnVal = getClass(0);
+      assert.areEqual(rtnVal,"");
+   }
+   [Test]
+   public void getFirstClassTest()
+   {
+      ClassInfo rtnVal = getFirstClass();
+      assert.areEqual(rtnVal,"");
+   }
+   [Test]
+   public void getLastClassTest()
+   {
+      ClassInfo rtnVal = getLastClass();
+      assert.areEqual(rtnVal,"");
+   }
+   [Test]
+   public void findLastOpenClassTest()
+   {
+      ClassInfo rtnVal = findLastOpenClass();
+      assert.areEqual(rtnVal,"");
+   }
+   [Test]
+   public void findClassWithLineTest()
+   {
+      ClassInfo rtnVal = findClassWithLine(0);
+      assert.areEqual(rtnVal,"");
+   }
+   [Test]
+   public void findMethodWithLineTest()
+   {
+      MethodInfo rtnVal = findMethodWithLine(0);
+      assert.areEqual(rtnVal,"");
+   }
+}
+
+[TestFixture]
+class MethodInfoTests extends MethodInfo
+{
+   [Test]
+   public void MethodInfoCtor1Test()
+   {
+      ctor rtnVal = MethodInfo(012);
+      assert.areEqual(testClass.startLine,"");
+      assert.areEqual(testClass.endLine,"");
+      assert.areEqual(testClass.access,"");
+      assert.areEqual(testClass.params,"");
+      assert.areEqual(testClass.type,"");
+      assert.areEqual(testClass.name,"");
+      assert.areEqual(testClass.name,"");
+      assert.areEqual(testClass.type,"");
+      assert.areEqual(testClass.name,"");
+      assert.areEqual(testClass.name,"");
+      assert.areEqual(rtnVal,"");
+      assert.areEqual(testClass.asserts,"");
+      assert.areEqual(testClass.tests,"");
+   }
+   [Test]
+   public void endTest()
+   {
+      MethodInfo testClass0 = new MockMethodInfo()
+;      end(0);
+      assert.areEqual(testClass0.endLine,"");
+   }
+   [Test]
+   public void setLinesTest()
+   {
+      MethodInfo testClass0 = new MockMethodInfo()
+;      setLines(0);
+      assert.areEqual(testClass0.lines,"");
+   }
+}
+
+[TestFixture]
+class MethodListTests extends MethodList
+{
+   [Test]
+   public void getMethodTest()
+   {
+      MethodInfo rtnVal = getMethod(0);
+      assert.areEqual(rtnVal,"");
+   }
+   [Test]
+   public void getFirstMethodTest()
+   {
+      MethodInfo rtnVal = getFirstMethod();
+      assert.areEqual(rtnVal,"");
+   }
+   [Test]
+   public void getLastMethodTest()
+   {
+      MethodInfo rtnVal = getLastMethod();
+      assert.areEqual(rtnVal,"");
+   }
+}
+
+[TestFixture]
+class VarInfoTests extends VarInfo
+{
+   [Test]
+   public void VarInfoCtor1Test()
+   {
+      MockVarInfo testClass = new MockVarInfo(01);
+      assert.areEqual(testClass.startLine,"");
+      assert.areEqual(testClass.endLine,"");
+      assert.areEqual(testClass.access,"");
+      assert.areEqual(testClass.type,"");
+      assert.areEqual(testClass.name,"");
+      assert.areEqual(testClass.nDimensions,"");
+   }
+   [Test]
+   public void VarInfoCtor2Test()
+   {
+      MockVarInfo testClass = new MockVarInfo(012);
+      assert.areEqual(testClass.type,"");
+      assert.areEqual(testClass.name,"");
+      assert.areEqual(testClass.nDimensions,"");
+      assert.areEqual(testClass.startLine,"");
+   }
+   [Test]
+   public void countDimensionsTest()
+   {
+      int rtnVal = countDimensions();
+      assert.areEqual(rtnVal,"");
+   }
+}
+
+[TestFixture]
+class VarListTests extends VarList
+{
+   [Test]
+   public void getVarTest()
+   {
+      VarInfo rtnVal = getVar(0);
+      assert.areEqual(rtnVal,"");
+   }
+   [Test]
+   public void getFirstVarTest()
+   {
+      VarInfo rtnVal = getFirstVar();
+      assert.areEqual(rtnVal,"");
+   }
+   [Test]
+   public void getLastVarTest()
+   {
+      VarInfo rtnVal = getLastVar();
+      assert.areEqual(rtnVal,"");
+   }
+}
+
+[TestFixture]
+class AssertionInfoTests extends AssertionInfo
+{
+   [Test]
+   public void AssertionInfoCtor1Test()
+   {
+      MockAssertionInfo testClass = new MockAssertionInfo(012);
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.fromClass,"");
+      assert.areEqual(testClass.dataName,"");
+      assert.areEqual(testClass.dataType,"");
+      assert.areEqual(testClass.isReturn,"");
+      assert.areEqual(testClass.dataName,"");
+      assert.areEqual(testClass.fromClass,"");
+      assert.areEqual(testClass.fromClass,"");
+      assert.areEqual(testClass.dataType,"");
+   }
+   [Test]
+   public void AssertionInfoCtor2Test()
+   {
+      MockAssertionInfo testClass = new MockAssertionInfo(0);
+      assert.areEqual(testClass.line,"");
+   }
+   [Test]
+   public void equalsTest()
+   {
+      boolean rtnVal = equals(0);
+      assert.areEqual(testClass,"");
+      assert.areEqual(rtnVal,"");
+   }
+}
+
+[TestFixture]
+class AssertionListTests extends AssertionList
+{
+   [Test]
+   public void getAssertionTest()
+   {
+      AssertionInfo rtnVal = getAssertion(0);
+      assert.areEqual(rtnVal,"");
+   }
+   [Test]
+   public void getFirstAssertionTest()
+   {
+      AssertionInfo rtnVal = getFirstAssertion();
+      assert.areEqual(rtnVal,"");
+   }
+   [Test]
+   public void getLastAssertionTest()
+   {
+      AssertionInfo rtnVal = getLastAssertion();
+      assert.areEqual(rtnVal,"");
+   }
+   [Test]
+   public void hasReturnAssertionTest()
+   {
+      boolean rtnVal = hasReturnAssertion();
+      assert.areEqual(rtnVal,"");
+   }
+   [Test]
+   public void addAssertionTest()
+   {
+      void rtnVal = addAssertion(0);
+      assert.areEqual(rtnVal,"");
+   }
+}
+
+[TestFixture]
+class TestInfoTests extends TestInfo
+{
+   [Test]
+   public void TestInfoCtor1Test()
+   {
+      MockTestInfo testClass = new MockTestInfo(0);
+      assert.areEqual(testClass.line,"");
+   }
+}
+
+[TestFixture]
+class TestListTests extends TestList
+{
+   [Test]
+   public void getTestTest()
+   {
+      TestInfo rtnVal = getTest(0);
+      assert.areEqual(rtnVal,"");
+   }
+   [Test]
+   public void getFirstTestTest()
+   {
+      TestInfo rtnVal = getFirstTest();
+      assert.areEqual(rtnVal,"");
+   }
+   [Test]
+   public void getLastTestTest()
+   {
+      TestInfo rtnVal = getLastTest();
+      assert.areEqual(rtnVal,"");
+   }
+}
+

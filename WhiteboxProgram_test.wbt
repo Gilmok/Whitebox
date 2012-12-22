@@ -1,0 +1,955 @@
+class WhiteboxProgramTests
+{
+   ClassList testProgram;
+   String testOutput;
+   String lineDelimiter;
+   String startBlock;
+   String endBlock;
+
+   WhiteboxProgramTests()
+   {
+      lineDelimiter = ";";
+      startBlock = "{";
+      endBlock = "}";
+   }
+
+   public ClassList generateSynTree(String[] lines, String fromFile, int startClass, boolean extractTests)
+   {
+      ClassList testProgram = new ClassList();
+      ClassInfo currentClass = null;
+      MethodInfo currentMethod = null;
+      int blockType = 1;  // class = 2, method = 3
+      //code block depth
+      int classDepth = 0;
+      int methodDepth = 0;
+      int depth = 0;
+      String line;
+      int classNo = startClass;
+      //load the file
+      //String[] lines = loadFile(fileName);
+      
+      //find classes, variables, and methods in each code line 
+      for(int i = 0; i < lines.length; i++)
+      {
+         line = lines[i].trim();
+         
+         //line = WhiteboxUtils.removeComments(line);
+         if(beginsCommentBlock(line))
+         {
+            blockType = blockType * -1;
+         }
+         
+         if(endsCommentBlock(line) && blockType < 0)
+         {
+            blockType = blockType * -1;
+            line = WhiteboxUtils.endTailComment(line);
+         }
+         if(blockType < 0)
+        	 continue;
+         line = WhiteboxUtils.removeNonCode(line, true);
+         if(isClassDecl(line))
+         {
+            ClassInfo newClass = new ClassInfo(line, i, fromFile, classNo);
+            testProgram.add(newClass);
+            currentClass = newClass;
+            blockType = 2;
+            classDepth = depth;
+            classNo++;
+            //System.out.println("Class: LineNo: " + i + ":" + line);
+         }
+         else if(blockType == 2 && isVarDecl(line))
+         {
+            VarInfo var = new VarInfo(line, i, currentClass.classIndex);
+            currentClass.vars.add(var);
+         }
+         else if(blockType == 2 && isConstrDecl(line, currentClass.className))
+         {
+            String lne = groupMethodLine(lines, i);
+            MethodInfo mInfo = new MethodInfo(lne, i, currentClass.className, currentClass.classIndex);
+            currentMethod = mInfo;
+            currentClass.methods.add(mInfo);
+            blockType = 3;
+            methodDepth = depth;
+            //System.out.println("md:" + methodDepth);
+         }
+         else if(blockType == 2 && isMethodDecl(line))
+         {
+            String lne = groupMethodLine(lines, i);
+            MethodInfo mInfo = new MethodInfo(lne, i, null, currentClass.classIndex);
+            currentMethod = mInfo;
+            currentClass.methods.add(mInfo);
+            blockType = 3;
+            methodDepth = depth;
+            //System.out.println("md:" + methodDepth);
+         }
+         if(beginsBlock(line))
+         {
+            depth++;
+            //System.out.println("BB:" + i + ":" + depth);
+         }
+         if(endsBlock(line))
+         {
+            depth--;
+            //System.out.println("EB:" + i + ":" + depth);
+            if(depth == classDepth)
+            {
+               currentClass.end(i);
+               currentClass = testProgram.findLastOpenClass();
+               blockType = 2;
+               classDepth--;
+               if(classDepth == -1)
+            	   blockType = 1;
+            }
+            else if(depth == methodDepth)
+            {
+               currentMethod.end(i);
+               int s = currentMethod.startLine;
+               int e = currentMethod.endLine;
+               int len = e - s;
+               String[] theMethod = new String[len + 1];
+               for(int k = 0; k <= len; k++)
+                  theMethod[k] = lines[s + k];
+               currentMethod.setLines(theMethod);
+               if(extractTests)
+               {
+            	   currentMethod.extractTests();
+            	   System.out.println(currentMethod.name + ":" + currentMethod.tests.size());
+               }
+               blockType = 2;
+            }   
+         }
+      }
+      return testProgram;
+   }
+
+   private String groupMethodLine(String[] lines, int lineNo)
+   {
+      int i = 0;
+      String rtnVal = "";
+      while(lines[lineNo + i].indexOf(')') < 0)
+      {
+         rtnVal += lines[lineNo + i];
+         i++;
+      }
+      rtnVal += lines[lineNo + i];
+      return rtnVal;
+   }
+
+   public ClassList findAssertionsAndTests(ClassList prog)
+   {
+      for(int j = 0; j < prog.size(); j++)
+      {
+         ClassInfo c = prog.getClass(j);
+         for(int k = 0; k < c.methods.size(); k++)
+         {
+            MethodInfo currentMethod = c.methods.getMethod(k);
+            
+            for(int i = 0; i < currentMethod.tests.size(); i++)
+            {
+            	TestInfo ti = currentMethod.tests.getTest(i);
+            	ti.setAssocMethod(currentMethod);
+            	String[] lines = ti.getTestLines();
+            	for(int l = 0; l < lines.length; l++)
+            	{
+            		if(yieldsAssertion(lines[l], prog))
+            			ti.asserts.addAssertion(new AssertionInfo(lines[l], currentMethod.startLine + l, prog));
+            			
+            	}
+            }
+         }
+      }
+      
+      return prog;
+   }
+
+   public void generateTests(String fileName, int startClass, boolean genTests)
+   {
+      String[] lines = loadFile(fileName);
+      System.out.println("Getting syntax tree...");
+      ClassList allClasses = generateSynTree(lines, fileName, startClass, genTests);
+      System.out.println("Finding tests....");
+      testProgram = allClasses;
+      if(genTests)
+      {
+    	  allClasses = findAssertionsAndTests(allClasses);
+    	  System.out.println("Dumping tests....");
+    	  testOutput = dumpTests(allClasses);
+    	  testProgram = allClasses;
+    	  String file0 = fileName.substring(0, fileName.indexOf("."));
+    	  saveTests(file0 + "_test.wbt");
+      }
+   }
+
+   public void saveTests(String outputFileName)
+   {	  
+	   String testManifest = getTestManifest(testProgram);
+	   String manFilename = outputFileName.substring(0, outputFileName.indexOf(".")) + ".wbm";      
+	   System.out.println("Saving tests to " + outputFileName + "...");
+	   outputFile(testOutput, outputFileName);
+	   System.out.println("Saving test mainifest to " + manFilename + "....");
+	   outputFile(testManifest, manFilename);
+   }
+
+   public ClassList getClassList()
+   {
+      return testProgram;
+   }
+
+   public ClassList getSyntaxTree(String filename, int startClassIndex)
+   {
+      String lines[] = loadFile(filename);
+      return generateSynTree(lines, filename, startClassIndex, true);
+      
+   }
+
+   public ClassList getTestSynTree(int startClassIndex, String manifestFN)
+   {
+      String lines[] = testOutput.split("\n");
+      System.out.println("Getting test syntax tree from test output...");
+      ClassList cl = generateSynTree(lines, "", startClassIndex, false);
+      String[] manifest = WhiteboxUtils.loadFile(manifestFN);
+      int classNo = -1;
+      int methNo = 0;
+      int testMethNo = 0;
+      int nMethods = 0;
+      int pathNo = 0;
+      String paths[] = null;
+      MethodInfo mi = null;
+      for(int i = 0; i < manifest.length; i++)
+      {
+    	  String man = manifest[i].trim();
+    	  if(man.startsWith("Class:"))
+    	  {
+    		  classNo++;
+    		  methNo = 0;
+    		  testMethNo = 0;
+    		  String nmeth = man.substring(man.lastIndexOf(":") + 1, man.lastIndexOf(" "));
+    		  nMethods = Integer.parseInt(nmeth);
+    		  System.out.println(man + "|methodsInClass:" + nMethods + " totalMethods:" + cl.getClass(classNo).methods.size());
+    	  }
+    	  else if(man.startsWith("Method:"))
+    	  {
+    		  
+    		  mi = cl.getClass(classNo).methods.getMethod(methNo);
+    		  paths = mi.getAllPaths(mi.lines);
+    		  String nTests = man.substring(man.lastIndexOf(":") + 1, man.lastIndexOf(" "));
+    		  int nt = Integer.parseInt(nTests);
+    		  methNo++;
+    		  pathNo = 0;
+    		  System.out.println(man + "|classNo:" + classNo + " methodNo:" + methNo + " plen:" + paths.length);
+    		  System.out.println(" Found:" + mi.name);
+    	  }
+    	  else if(man.startsWith("Test:"))
+    	  {
+    		  System.out.println(man + "|classNo:" + classNo + " testMethNo:" + testMethNo);
+    		  MethodInfo testMI = cl.getClass(classNo).methods.getMethod(testMethNo + nMethods);
+    		  System.out.println(" Found:" + testMI.name);
+    		  String cn = man.substring(man.lastIndexOf(":"), man.length());
+    		  TestInfo ti = new TestInfo(testMI, cn);
+    		  ti.setAssocMethod(mi);
+    		  ti.testLines = paths[pathNo].split("\n");
+    		  mi.tests.add(ti);
+    		  testMethNo++;
+    		  pathNo++;
+    	  }
+      }
+      return cl;
+   }
+
+   public String[] loadFile(String fileName)
+   {
+      String[] rtnVal = null;
+      BufferedReader br;
+      try
+      {
+         FileReader fr = new FileReader(fileName);
+         br = new BufferedReader(fr);
+         LinkedList strList = new LinkedList();
+         String s;
+         while(true)
+         {
+            s = br.readLine();
+            if(s != null)
+            {
+               strList.add(s);
+            }
+            else
+               break;
+         }
+         rtnVal = new String[strList.size()];
+         for(int i = 0; i < strList.size(); i++)
+            rtnVal[i] = (String) strList.get(i);
+         br.close();
+      }
+      catch(IOException ex)
+      {
+         System.err.println(ex.getMessage());
+         ex.printStackTrace();
+      }
+      return rtnVal;
+   }
+
+   public String dumpTests(ClassList allClasses)
+   {
+      String out = "";
+      for(int i = 0; i < allClasses.size(); i++)
+      {
+         ClassInfo ci = allClasses.getClass(i);
+         //out += "\n[TestFixture]\n";
+         out += "class " + allClasses.getClass(i).className + "Tests\n";
+         out += "{\n";
+         int ctorCount = 0;
+         //int methCount = 0;
+         for(int j = 0; j < ci.vars.size(); j++)
+         {
+        	 VarInfo vi = ci.vars.getVar(j);
+        	 out += "   " + vi.type + " " + vi.name + ";\n";
+         }
+         out += "\n";
+         for(int j = 0; j < ci.methods.size(); j++)
+         {
+        	 MethodInfo mi = ci.methods.getMethod(j);
+        	 out += mi.getTestFirstLine() + "\n";
+        	 for(int k = 1; k < mi.lines.length; k++)
+        		 out += mi.lines[k] + "\n";
+        	 out += "\n";
+         }
+         for(int j = 0; j < ci.methods.size(); j++)
+         {
+            MethodInfo mi = ci.methods.getMethod(j);
+            String mStr = "";
+            if(mi.returnType.type.equals("ctor"))
+            {
+               ctorCount++;
+               mStr = "Ctor" + ctorCount;
+            }
+            else
+            {
+            	int mc = ci.methods.countMethodsWithName(mi);
+            	mStr = "Meth" + mc;
+            }
+            /*if(mi.tests.size() <= 1)
+            {
+               out += generateTest(-1, mi, mStr);
+            }
+            else
+            {*/
+               for(int k = 0; k < mi.tests.size(); k++)
+               {
+            	  TestInfo ti = mi.tests.getTest(k);
+            	  String tst = generateTest(k, mi, mStr);
+            	  ti.setTestCode(tst);
+                  out += tst;
+               }
+            //}
+         }
+         out += "}\n";
+      }
+      return out;
+   }
+
+   public String getTestManifest(ClassList cl)
+   {
+	   String out = "";
+	   for(int i = 0; i < cl.size(); i++)
+	   {
+	      ClassInfo ci = cl.getClass(i);
+	      out += "Class:" + ci.className + ":" + ci.methods.size() + " methods\n";
+	      for(int j = 0; j < ci.methods.size(); j++)
+	      {
+	         MethodInfo mi = ci.methods.getMethod(j);
+	         out += "   Method:" + mi.name + ":" + mi.tests.size() + " tests\n";
+	         for(int k = 0; k < mi.tests.size(); k++)
+	         {
+	        	 TestInfo ti = mi.tests.getTest(k);
+	        	 out += "      Test:" + ti.name + ":" + ti.getCommentName() + "\n";
+	         }
+	      }
+	   }
+	   return out; 
+   }
+
+   public String generateTest(int testNo, MethodInfo mi, String methName)
+   {
+      String out = "";
+      //out += "   [Test]\n";
+      out += "   public void " + mi.name + "Test" + methName; 
+      //AssertionList al = mi.asserts;
+      //if(testNo != -1)
+      //{
+         out += "_" + testNo;
+         AssertionList al = mi.tests.getTest(testNo).asserts;
+      //}
+      out += "()\n";
+      out += "   {\n";
+      String tab = "   ";
+      LinkedList classes = new LinkedList();
+      for(int i = 0; i < al.size(); i++)
+      {
+         AssertionInfo a = al.getAssertion(i);
+         
+         if(a.fromClass != "")
+         {
+            boolean found = false;
+            for(int j = 0; j < classes.size(); j++)
+            {
+               String str = (String) classes.get(j);
+               if(a.fromClass.equals(str))
+               {
+                  found = true;
+                  break;
+               }
+            }
+            if(!found) 
+            {
+               if(methName.startsWith("Meth"))
+                  out += tab + tab + a.fromClass + " testClass" + classes.size() + " = new " + a.fromClass + "Test();\n";
+               classes.add(a.fromClass);
+            }
+         }
+         
+      }
+      if(al.size() > 0)
+      {
+         if(al.hasReturnAssertion())
+            out += tab + tab + mi.returnType.type + " rtnVal = " + mi.name;
+         else if(!methName.startsWith("Meth"))
+         {
+            String ucFirst = mi.name;
+            char c = mi.name.charAt(0);
+            c = Character.toUpperCase(c);
+            ucFirst = c + ucFirst.substring(1, ucFirst.length());
+            out += tab + tab + ucFirst + "Tests testClass = new " + ucFirst + "Tests";
+         }
+            
+         else
+            out += tab + tab + mi.name;
+         out += "(";
+         for(int i = 0; i < mi.params.size(); i++)
+            out += i;
+         out += ");\n";
+      }
+      boolean returnFound = false;
+      for(int i = 0; i < al.size(); i++)
+      {
+         AssertionInfo a = al.getAssertion(i);
+         if(a.isReturn && !returnFound)
+         {
+            out += tab + tab + "assert.areEqual(rtnVal,\"\");\n";
+            returnFound = true;
+         }
+         else if(a.isReturn && returnFound)
+            continue;
+         else
+         {
+            out += tab + tab + "assert.areEqual(testClass";
+            String[] dots = a.dataName.split("\\.");
+            for(int j = 0; j < classes.size(); j++)
+            {
+               String str = (String) classes.get(j);
+               if(a.fromClass.equals(str))
+               {
+                  if(methName.startsWith("Meth"))
+                     out += j;
+                  if(dots.length == 1)
+                     out += "." + dots[0];
+                  else
+                  {
+                     for(int k = 1; k < dots.length; k++)
+                        out += "." + dots[k];
+                  }
+                  break;
+               }
+            }
+            out += ",\"\");\n";
+         }
+      }
+         
+      out += "   }\n";
+      return out;
+   }
+
+   public void outputFile(String in, String outputFN)
+   {
+      try
+      {
+         FileWriter fw = new FileWriter(outputFN);
+         BufferedWriter bw = new BufferedWriter(fw);
+         bw.write(in + "\n");
+         bw.close();
+      }
+      catch(IOException ex)
+      {
+         ex.printStackTrace();
+      }
+   }
+
+   private boolean isClassDecl(String in)
+   {
+      if(in.startsWith("class ") || in.indexOf(" class ") > -1)
+      {
+         return(true);
+      }
+      return(false);
+   }
+
+   private boolean isMethodDecl(String in)
+   {
+      String temp = in;
+      temp = WhiteboxUtils.removeAccessModifiers(temp);
+      String paramList = "";
+      //System.out.println("Checking for Method: temp is:" + temp);
+      try
+      {
+         paramList = temp.substring(temp.indexOf("("), temp.length());
+      }
+      catch(StringIndexOutOfBoundsException ex)
+      {
+         //System.out.println("Failed to find ()");
+         return false;
+      }
+      //System.out.println("ParamList is:" + paramList);
+      //System.out.println("Temp is:" + temp);
+      temp = temp.substring(0, temp.indexOf(paramList));
+      
+      //System.out.println("Temp is:" + temp);
+      if(temp.split(" ").length == 2 && paramList.length() > 0)
+         return true;
+      else
+         return false;
+   }
+
+   private boolean isConstrDecl(String in, String className)
+   {
+      String temp = in;
+      temp = WhiteboxUtils.removeAccessModifiers(temp);
+      String paramList = "";
+      try
+      {
+         paramList = temp.substring(temp.indexOf("("), temp.length());
+      }
+      catch(StringIndexOutOfBoundsException ex)
+      {
+         return false;
+      }
+      temp = temp.substring(0, temp.indexOf(paramList));
+      
+      //System.out.println("Temp is:" + temp);
+      if(temp.equals(className) && paramList.length() > 0)
+         return true;
+      else
+         return false;
+   }
+
+   private boolean isVarDecl(String in)
+   {
+      String temp = in;
+      try
+      {
+         temp = in.substring(0, in.indexOf(';'));
+         temp = in.substring(0, in.indexOf('='));
+      }
+      catch(StringIndexOutOfBoundsException ex)
+      {}
+      if(temp.indexOf('(') > -1)
+         return false;
+      temp = WhiteboxUtils.removeAccessModifiers(temp);
+      if(temp.split(" ").length == 2)
+         return true;
+      else
+         return false;
+   }
+
+   private boolean beginsBlock(String in)
+   {
+      if(in.trim().indexOf("{") >= 0)
+         return true;
+      else
+         return false;
+   }
+
+   private boolean endsBlock(String in)
+   {
+      if(in.trim().indexOf("}") >= 0)
+         return true;
+      else
+         return false;
+   }
+
+   private boolean beginsCommentBlock(String in)
+   {
+      if(in.trim().startsWith("/*"))
+      {
+         return true;
+      }
+      return false;
+   }
+
+   private boolean containsCommentBlock(String in)
+   {
+      if(WhiteboxUtils.removeStrings(in, false).indexOf("/*") > -1)
+      {
+         return true;
+      }   
+      return false;
+   }
+
+   private boolean endsCommentBlock(String in)
+   {
+      if(WhiteboxUtils.removeStrings(in, false).indexOf("*/") > -1)
+      {
+         return true;
+      }   
+      return false;
+   }
+
+   private boolean yieldsAssertion(String line, ClassList progTree)
+   {
+      //System.out.println("Checking line:" + line);
+      line = line.trim();
+      if(line.equals(""))
+         return false;
+      if(line.startsWith("return"))
+         return true;
+      String[] equ = line.split("=");
+      if(equ[0].split(" ").length > 1)
+         return false;
+      else
+      {
+         String[] dots = equ[0].split("\\.");
+         String lastSection;
+         if(dots.length == 0)
+            lastSection = equ[0];
+         else
+            lastSection = dots[dots.length - 1];
+         lastSection = lastSection.trim();
+         if(lastSection.indexOf('(') > 0)
+            return false;
+         for(int i = 0; i < progTree.size(); i++)
+         {
+            ClassInfo ci = progTree.getClass(i);
+            VarList vl = ci.vars;
+            for(int j = 0; j < vl.size(); j++)
+            {
+               if(vl.getVar(j).name.equals(lastSection))
+                  return true;
+            }
+         }
+      }
+      return false;
+   }
+
+   private boolean yieldsNewTest(String line, ClassList progTree)
+   {
+      return false;
+   }
+
+   public static void main(String args[])
+   {
+      WhiteboxProgram wb = new WhiteboxProgram();
+      
+      //wb.generateTests(args[0], args[1], 0);
+      String[] in = WhiteboxUtils.loadFile("functest.txt");
+      //WhiteboxProgram wb = new WhiteboxProgram();
+      //String[] out = wb.getAllPaths(in);
+      MethodInfo mi = new MethodInfo(in[0], 0, "", 0);
+      String[] out = mi.getAllPaths(in);
+      for(int i = 0; i < out.length; i++)
+      {
+    	  System.out.println(out[i]);
+    	  System.out.println("=========================");
+      }
+      
+   }
+
+   public void WhiteboxProgramTestCtor1_0()
+   {
+      WhiteboxProgramTests testClass = new WhiteboxProgramTests();
+      assert.areEqual(testClass.lineDelimiter,"");
+      assert.areEqual(testClass.startBlock,"");
+      assert.areEqual(testClass.endBlock,"");
+   }
+   public void generateSynTreeTestMeth1_0()
+   {
+      ClassList rtnVal = generateSynTree(0123);
+      assert.areEqual(rtnVal,"");
+   }
+   public void generateSynTreeTestMeth1_1()
+   {
+      ClassList rtnVal = generateSynTree(0123);
+      assert.areEqual(rtnVal,"");
+   }
+   public void generateSynTreeTestMeth1_2()
+   {
+      ClassList rtnVal = generateSynTree(0123);
+      assert.areEqual(rtnVal,"");
+   }
+   public void generateSynTreeTestMeth1_3()
+   {
+      ClassList rtnVal = generateSynTree(0123);
+      assert.areEqual(rtnVal,"");
+   }
+   public void groupMethodLineTestMeth1_0()
+   {
+      String rtnVal = groupMethodLine(01);
+      assert.areEqual(rtnVal,"");
+   }
+   public void findAssertionsAndTestsTestMeth1_0()
+   {
+      ClassList rtnVal = findAssertionsAndTests(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void generateTestsTestMeth1_0()
+   {
+      WhiteboxProgram testClass0 = new WhiteboxProgramTest();
+      generateTests(012);
+      assert.areEqual(testClass0.testProgram,"");
+      assert.areEqual(testClass0.testOutput,"");
+   }
+   public void generateTestsTestMeth1_1()
+   {
+      WhiteboxProgram testClass0 = new WhiteboxProgramTest();
+      generateTests(012);
+      assert.areEqual(testClass0.testProgram,"");
+   }
+   public void saveTestsTestMeth1_0()
+   {
+   }
+   public void getClassListTestMeth1_0()
+   {
+      ClassList rtnVal = getClassList();
+      assert.areEqual(rtnVal,"");
+   }
+   public void getSyntaxTreeTestMeth1_0()
+   {
+      ClassList rtnVal = getSyntaxTree(01);
+      assert.areEqual(rtnVal,"");
+   }
+   public void getTestSynTreeTestMeth1_0()
+   {
+      ClassList rtnVal = getTestSynTree(01);
+      assert.areEqual(rtnVal,"");
+   }
+   public void loadFileTestMeth1_0()
+   {
+      String[] rtnVal = loadFile(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void loadFileTestMeth1_1()
+   {
+      String[] rtnVal = loadFile(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void dumpTestsTestMeth1_0()
+   {
+      String rtnVal = dumpTests(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void dumpTestsTestMeth1_1()
+   {
+      String rtnVal = dumpTests(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void getTestManifestTestMeth1_0()
+   {
+      String rtnVal = getTestManifest(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void generateTestTestMeth1_0()
+   {
+      String rtnVal = generateTest(012);
+      assert.areEqual(rtnVal,"");
+   }
+   public void generateTestTestMeth1_1()
+   {
+      String rtnVal = generateTest(012);
+      assert.areEqual(rtnVal,"");
+   }
+   public void generateTestTestMeth1_2()
+   {
+      String rtnVal = generateTest(012);
+      assert.areEqual(rtnVal,"");
+   }
+   public void generateTestTestMeth1_3()
+   {
+      String rtnVal = generateTest(012);
+      assert.areEqual(rtnVal,"");
+   }
+   public void generateTestTestMeth1_4()
+   {
+      String rtnVal = generateTest(012);
+      assert.areEqual(rtnVal,"");
+   }
+   public void generateTestTestMeth1_5()
+   {
+      String rtnVal = generateTest(012);
+      assert.areEqual(rtnVal,"");
+   }
+   public void generateTestTestMeth1_6()
+   {
+      String rtnVal = generateTest(012);
+      assert.areEqual(rtnVal,"");
+   }
+   public void generateTestTestMeth1_7()
+   {
+      String rtnVal = generateTest(012);
+      assert.areEqual(rtnVal,"");
+   }
+   public void generateTestTestMeth1_8()
+   {
+      String rtnVal = generateTest(012);
+      assert.areEqual(rtnVal,"");
+   }
+   public void generateTestTestMeth1_9()
+   {
+      String rtnVal = generateTest(012);
+      assert.areEqual(rtnVal,"");
+   }
+   public void generateTestTestMeth1_10()
+   {
+      String rtnVal = generateTest(012);
+      assert.areEqual(rtnVal,"");
+   }
+   public void generateTestTestMeth1_11()
+   {
+      String rtnVal = generateTest(012);
+      assert.areEqual(rtnVal,"");
+   }
+   public void generateTestTestMeth1_12()
+   {
+      String rtnVal = generateTest(012);
+      assert.areEqual(rtnVal,"");
+   }
+   public void generateTestTestMeth1_13()
+   {
+      String rtnVal = generateTest(012);
+      assert.areEqual(rtnVal,"");
+   }
+   public void generateTestTestMeth1_14()
+   {
+      String rtnVal = generateTest(012);
+      assert.areEqual(rtnVal,"");
+   }
+   public void generateTestTestMeth1_15()
+   {
+      String rtnVal = generateTest(012);
+      assert.areEqual(rtnVal,"");
+   }
+   public void outputFileTestMeth1_0()
+   {
+   }
+   public void isClassDeclTestMeth1_0()
+   {
+      boolean rtnVal = isClassDecl(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void isClassDeclTestMeth1_1()
+   {
+      boolean rtnVal = isClassDecl(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void isMethodDeclTestMeth1_0()
+   {
+      boolean rtnVal = isMethodDecl(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void isMethodDeclTestMeth1_1()
+   {
+      boolean rtnVal = isMethodDecl(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void isConstrDeclTestMeth1_0()
+   {
+      boolean rtnVal = isConstrDecl(01);
+      assert.areEqual(rtnVal,"");
+   }
+   public void isConstrDeclTestMeth1_1()
+   {
+      boolean rtnVal = isConstrDecl(01);
+      assert.areEqual(rtnVal,"");
+   }
+   public void isVarDeclTestMeth1_0()
+   {
+      boolean rtnVal = isVarDecl(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void isVarDeclTestMeth1_1()
+   {
+      boolean rtnVal = isVarDecl(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void beginsBlockTestMeth1_0()
+   {
+      boolean rtnVal = beginsBlock(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void beginsBlockTestMeth1_1()
+   {
+      boolean rtnVal = beginsBlock(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void endsBlockTestMeth1_0()
+   {
+      boolean rtnVal = endsBlock(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void endsBlockTestMeth1_1()
+   {
+      boolean rtnVal = endsBlock(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void beginsCommentBlockTestMeth1_0()
+   {
+      boolean rtnVal = beginsCommentBlock(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void beginsCommentBlockTestMeth1_1()
+   {
+      boolean rtnVal = beginsCommentBlock(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void containsCommentBlockTestMeth1_0()
+   {
+      boolean rtnVal = containsCommentBlock(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void containsCommentBlockTestMeth1_1()
+   {
+      boolean rtnVal = containsCommentBlock(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void endsCommentBlockTestMeth1_0()
+   {
+      boolean rtnVal = endsCommentBlock(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void endsCommentBlockTestMeth1_1()
+   {
+      boolean rtnVal = endsCommentBlock(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void yieldsAssertionTestMeth1_0()
+   {
+      boolean rtnVal = yieldsAssertion(01);
+      assert.areEqual(rtnVal,"");
+   }
+   public void yieldsAssertionTestMeth1_1()
+   {
+      boolean rtnVal = yieldsAssertion(01);
+      assert.areEqual(rtnVal,"");
+   }
+   public void yieldsAssertionTestMeth1_2()
+   {
+      boolean rtnVal = yieldsAssertion(01);
+      assert.areEqual(rtnVal,"");
+   }
+   public void yieldsNewTestTestMeth1_0()
+   {
+      boolean rtnVal = yieldsNewTest(01);
+      assert.areEqual(rtnVal,"");
+   }
+   public void mainTestMeth1_0()
+   {
+   }
+}
+

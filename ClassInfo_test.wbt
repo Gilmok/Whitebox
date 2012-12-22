@@ -1,0 +1,4100 @@
+class ClassInfoTests
+{
+   String className;
+   int access;
+   String fromFile;
+   VarList vars;
+   MethodList methods;
+   int startLine;
+   int endLine;
+   int classIndex;
+
+   ClassInfoTests(String in, int lineNo, String fromFile, int ci)
+   {
+      startLine = lineNo;
+      this.fromFile = fromFile;
+      endLine = -1;
+      classIndex = ci;
+      
+      access = WhiteboxUtils.getAccessLevel(in);
+      in = WhiteboxUtils.removeAccessModifiers(in);
+      className = in.substring(in.indexOf("class ") + 6);
+//    get rid of "extends..."
+      if(className.indexOf(" ") > 0)
+         className = className.substring(0, className.indexOf(" ")); 
+      vars = new VarList();
+      methods = new MethodList(classIndex);
+   }
+
+   public void end(int lineNo)
+   {
+      endLine = lineNo;
+   }
+
+   ClassInfo copyClass()
+   {
+      ClassInfo newClassInfo = new ClassInfo("class " + className, 0, fromFile, classIndex);
+      for(int i = 0; i < vars.size(); i++)
+      {
+         newClassInfo.vars.add(vars.get(i));
+      }
+      for(int i = 0; i < methods.size(); i++)
+      {
+         newClassInfo.methods.add(methods.get(i));
+      }
+      return newClassInfo;
+   }
+
+   public void ClassInfoTestCtor1_0()
+   {
+      ClassInfoTests testClass = new ClassInfoTests(0123);
+      assert.areEqual(testClass.startLine,"");
+      assert.areEqual(testClass.fromFile,"");
+      assert.areEqual(testClass.endLine,"");
+      assert.areEqual(testClass.classIndex,"");
+      assert.areEqual(testClass.access,"");
+      assert.areEqual(testClass.className,"");
+      assert.areEqual(testClass.vars,"");
+      assert.areEqual(testClass.methods,"");
+   }
+   public void ClassInfoTestCtor1_1()
+   {
+      ClassInfoTests testClass = new ClassInfoTests(0123);
+      assert.areEqual(testClass.startLine,"");
+      assert.areEqual(testClass.fromFile,"");
+      assert.areEqual(testClass.endLine,"");
+      assert.areEqual(testClass.classIndex,"");
+      assert.areEqual(testClass.access,"");
+      assert.areEqual(testClass.className,"");
+      assert.areEqual(testClass.vars,"");
+      assert.areEqual(testClass.methods,"");
+   }
+   public void endTestMeth1_0()
+   {
+      ClassInfo testClass0 = new ClassInfoTest();
+      end(0);
+      assert.areEqual(testClass0.endLine,"");
+   }
+   public void copyClassTestMeth1_0()
+   {
+      ClassInfo rtnVal = copyClass();
+      assert.areEqual(rtnVal,"");
+   }
+}
+class ClassListTests
+{
+
+   public ClassInfo getClass(int index)
+   {
+      if(index < size())
+      {
+         return (ClassInfo) super.get(index);
+      }
+      else
+      {
+         return null;
+      }
+   }
+
+   public ClassInfo getFirstClass()
+   {
+      return (ClassInfo) super.getFirst();
+   }
+
+   public ClassInfo getLastClass()
+   {
+      return (ClassInfo) super.getLast();
+   }
+
+   public ClassInfo findLastOpenClass()
+   {
+      ClassInfo last = null;
+      for(int i = 0; i < size(); i++)
+      {
+         ClassInfo ci = getClass(i);
+         if(ci.endLine == -1)
+            last = ci;
+      }
+      return(last);
+   }
+
+   public ClassInfo findClassWithLine(int line)
+   {
+      for(int i = 0; i < size(); i++)
+      {
+         ClassInfo ci = getClass(i);
+         if(ci.startLine < line && ci.endLine > line)
+         {
+            return ci;
+         }
+      }
+      return null;
+   }
+
+   public MethodInfo findMethodWithLine(int line)
+   {
+      for(int i = 0; i < size(); i++)
+      {
+         ClassInfo ci = getClass(i);
+         if(ci.startLine < line && ci.endLine > line)
+         {
+            MethodList ml = ci.methods;
+            for(int j = 0; j < ml.size(); j++)
+            {
+               MethodInfo mi = ml.getMethod(j);
+               if(mi.startLine < line && mi.endLine > line)
+                  return(mi);
+            }
+         }
+      }
+      return(null);
+   }
+
+   public void save(String filename)
+   {
+      String outString = "";
+      try 
+      {
+         BufferedWriter out = new BufferedWriter(new FileWriter(filename));
+         for(int i = 0; i < size(); i++)
+         {
+            ClassInfo ci = getClass(i);
+            outString += "class " + ci.className + "\n{";
+            for(int j = 0; j < ci.vars.size(); j++)
+            {
+               VarInfo vi = ci.vars.getVar(j);
+               outString += "   " + vi.type + " " + vi.name + ";\n";
+            }
+            outString += "\n";
+            for(int j = 0; j < ci.methods.size(); j++)
+            {
+               MethodInfo mi = ci.methods.getMethod(j);
+               for(int k = 0; k < mi.lines.length; k++)
+                  outString += "   " + mi.lines[k] + "\n";
+            }
+            outString += "\n";
+         }
+         out.write(outString);
+         out.close();
+      } 
+      catch (IOException e) 
+      {
+         System.err.println(e.getMessage());
+         System.err.println(e.getStackTrace());
+      }
+   }
+
+   public MethodInfo findMethodForTest(TestInfo ti)
+   {
+      //ClassInfo ci = getClass(mi.classIndex);
+      //return ci.methods.getMethodForTest(mi.name);
+	  return ti.getAssocMethod();
+   }
+
+   public ClassInfo findClassWithMethod(MethodInfo mi)
+   {
+      for(int i = 0; i < size(); i++)
+      {
+         ClassInfo ci = getClass(i);
+         MethodList ml = ci.methods;
+         for(int j = 0; j < ml.size(); j++)
+         {
+            MethodInfo miIn = ml.getMethod(j);
+            if(mi == miIn)
+               return ci;
+         }
+      }
+      return(null);
+   }
+
+   public ClassInfo findClassWithName(String in)
+   {
+      for(int i = 0; i < size(); i++)
+      {
+         ClassInfo ci = getClass(i);
+         if(ci.className.equals(in))
+            return ci;
+      }
+      return null;
+   }
+
+   public void getClassTestMeth1_0()
+   {
+      ClassInfo rtnVal = getClass(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void getClassTestMeth1_1()
+   {
+      ClassInfo rtnVal = getClass(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void getFirstClassTestMeth1_0()
+   {
+      ClassInfo rtnVal = getFirstClass();
+      assert.areEqual(rtnVal,"");
+   }
+   public void getLastClassTestMeth1_0()
+   {
+      ClassInfo rtnVal = getLastClass();
+      assert.areEqual(rtnVal,"");
+   }
+   public void findLastOpenClassTestMeth1_0()
+   {
+      ClassInfo rtnVal = findLastOpenClass();
+      assert.areEqual(rtnVal,"");
+   }
+   public void findLastOpenClassTestMeth1_1()
+   {
+      ClassInfo rtnVal = findLastOpenClass();
+      assert.areEqual(rtnVal,"");
+   }
+   public void findClassWithLineTestMeth1_0()
+   {
+      ClassInfo rtnVal = findClassWithLine(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void findClassWithLineTestMeth1_1()
+   {
+      ClassInfo rtnVal = findClassWithLine(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void findMethodWithLineTestMeth1_0()
+   {
+      MethodInfo rtnVal = findMethodWithLine(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void findMethodWithLineTestMeth1_1()
+   {
+      MethodInfo rtnVal = findMethodWithLine(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void findMethodWithLineTestMeth1_2()
+   {
+      MethodInfo rtnVal = findMethodWithLine(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void saveTestMeth1_0()
+   {
+   }
+   public void findMethodForTestTestMeth1_0()
+   {
+      MethodInfo rtnVal = findMethodForTest(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void findClassWithMethodTestMeth1_0()
+   {
+      ClassInfo rtnVal = findClassWithMethod(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void findClassWithMethodTestMeth1_1()
+   {
+      ClassInfo rtnVal = findClassWithMethod(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void findClassWithNameTestMeth1_0()
+   {
+      ClassInfo rtnVal = findClassWithName(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void findClassWithNameTestMeth1_1()
+   {
+      ClassInfo rtnVal = findClassWithName(0);
+      assert.areEqual(rtnVal,"");
+   }
+}
+class MethodInfoTests
+{
+   String name;
+   VarList params;
+   int access;
+   VarInfo returnType;
+   int startLine;
+   int endLine;
+   String[] lines;
+   AssertionList asserts;
+   TestList tests;
+   int compileState;
+   int testState;
+   int classIndex;
+   int methodNameIndex;
+
+   MethodInfoTests(String in, int lineNo, String classConstructor, int ci)
+   {
+      startLine = lineNo;
+      endLine = -1;
+      classIndex = ci;
+      //System.out.println("Method: LineNo: " + lineNo + ": " + in);
+      access = WhiteboxUtils.getAccessLevel(in);
+      in = WhiteboxUtils.removeAccessModifiers(in);
+      
+            
+      params = new VarList();
+      String paramList = in.substring(in.indexOf('(') + 1, in.indexOf(')'));
+      if(paramList.equals("") == false)
+      {
+         String[] allParams = paramList.split(",");
+         for(int i = 0; i < allParams.length; i++)
+         {
+            String[] paramPair = allParams[i].split(" ");
+            int j = 0;
+            if(paramPair[0].equals(""))
+            	j++;
+            params.add(new VarInfo(paramPair[j], paramPair[j + 1], lineNo));
+         }
+      }
+           
+      String type;
+      if(classConstructor == null)
+      {
+         type = in.substring(0, in.indexOf(" "));
+         name = in.substring(in.indexOf(" "));
+         //if(name.endsWith(paramList))
+         //{
+         name = name.substring(0, name.indexOf("(")); 
+         //}
+      }
+      else
+      {
+         type = "ctor";
+         name = classConstructor;
+      }
+      name = name.trim();
+      returnType = new VarInfo(type, name, lineNo);
+      
+      asserts = new AssertionList();
+      tests = new TestList();
+   }
+
+   public void end(int lineNo)
+   {
+      endLine = lineNo;
+   }
+
+   public void setLines(String[] in)
+   {
+      lines = in;
+      //setupTests();
+   }
+
+   public void setLines(String in)
+   {
+      lines = in.split("\n");
+      //setupTests();
+   }
+
+   public String getLines()
+   {
+	   String rtnVal = "";
+	   for(int i = 0; i < lines.length; i++)
+		   rtnVal += lines[i] + "\n";
+	   return rtnVal;
+   }
+
+   public boolean isSame(MethodInfo other)
+   {
+      String[] lines2 = other.lines;
+      if(lines.length != lines2.length)
+         return false;
+      for(int i = 0; i < lines.length; i++)
+      {
+         if(!lines.equals(lines2))
+            return false;
+      }
+      return true;
+   }
+
+   public String getMethodText()
+   {
+      String rtnVal = "";
+      for(int i = 0; i < lines.length; i++)
+         rtnVal += lines[i] + "\n";
+      return rtnVal;
+   }
+
+   public String toString()
+   {
+      return name;
+   }
+
+   public void setTestState(int x)
+   {
+      testState = x;
+   }
+
+   public void setCompileState(int x)
+   {
+      compileState = x;
+   }
+
+   public String getIconState()
+   {
+      int iconState = compileState * 4 + testState;
+      return("ts" + iconState + ".gif");
+   }
+
+   public String stripTestName(String in)
+   {
+      int testIndex = in.lastIndexOf("Test");
+      if(testIndex > 0)
+         return in.substring(0, testIndex);
+      else
+         return null;
+   }
+
+   public String getTestFirstLine()
+   {
+	   if(returnType.type.equals("ctor"))
+	   {
+	      int eom = lines[0].indexOf("(");
+	      String a = lines[0].substring(0, eom);
+	      String b = lines[0].substring(eom, lines[0].length());
+	      return a + "Tests" + b;
+	   }
+	   else
+		   return lines[0];
+   }
+
+   private String[] copyLines()
+   {
+	   String[] rtnVal = new String[lines.length];
+	   for(int i = 0; i < lines.length; i++)
+		   rtnVal[i] = new String(lines[i]);
+	   return rtnVal;
+   }
+
+   public void extractTests()
+   {
+	   String[] all = getAllPaths(copyLines());
+	   for(int i = 0; i < all.length; i++)
+	   {
+		   tests.add(new TestInfo(all[i], name + "Test_" + String.valueOf(i)));
+	   }
+   }
+
+   public String[] getAllPaths(String[] meth)  //public for testing only
+   {
+	   	   
+	   FunctionTree tree = new FunctionTree(meth);
+	   //return null;
+	   return(tree.getCodePaths());
+   }
+
+   public void MethodInfoTestCtor1_0()
+   {
+      ctor rtnVal = MethodInfo(0123);
+      assert.areEqual(testClass.startLine,"");
+      assert.areEqual(testClass.endLine,"");
+      assert.areEqual(testClass.classIndex,"");
+      assert.areEqual(testClass.access,"");
+      assert.areEqual(testClass.params,"");
+      assert.areEqual(testClass.type,"");
+      assert.areEqual(testClass.name,"");
+      assert.areEqual(rtnVal,"");
+      assert.areEqual(testClass.asserts,"");
+      assert.areEqual(testClass.tests,"");
+   }
+   public void MethodInfoTestCtor1_1()
+   {
+      ctor rtnVal = MethodInfo(0123);
+      assert.areEqual(testClass.startLine,"");
+      assert.areEqual(testClass.endLine,"");
+      assert.areEqual(testClass.classIndex,"");
+      assert.areEqual(testClass.access,"");
+      assert.areEqual(testClass.params,"");
+      assert.areEqual(testClass.type,"");
+      assert.areEqual(testClass.name,"");
+      assert.areEqual(rtnVal,"");
+      assert.areEqual(testClass.asserts,"");
+      assert.areEqual(testClass.tests,"");
+   }
+   public void MethodInfoTestCtor1_2()
+   {
+      ctor rtnVal = MethodInfo(0123);
+      assert.areEqual(testClass.startLine,"");
+      assert.areEqual(testClass.endLine,"");
+      assert.areEqual(testClass.classIndex,"");
+      assert.areEqual(testClass.access,"");
+      assert.areEqual(testClass.params,"");
+      assert.areEqual(testClass.type,"");
+      assert.areEqual(testClass.name,"");
+      assert.areEqual(rtnVal,"");
+      assert.areEqual(testClass.asserts,"");
+      assert.areEqual(testClass.tests,"");
+   }
+   public void MethodInfoTestCtor1_3()
+   {
+      ctor rtnVal = MethodInfo(0123);
+      assert.areEqual(testClass.startLine,"");
+      assert.areEqual(testClass.endLine,"");
+      assert.areEqual(testClass.classIndex,"");
+      assert.areEqual(testClass.access,"");
+      assert.areEqual(testClass.params,"");
+      assert.areEqual(testClass.type,"");
+      assert.areEqual(testClass.name,"");
+      assert.areEqual(rtnVal,"");
+      assert.areEqual(testClass.asserts,"");
+      assert.areEqual(testClass.tests,"");
+   }
+   public void MethodInfoTestCtor1_4()
+   {
+      ctor rtnVal = MethodInfo(0123);
+      assert.areEqual(testClass.startLine,"");
+      assert.areEqual(testClass.endLine,"");
+      assert.areEqual(testClass.classIndex,"");
+      assert.areEqual(testClass.access,"");
+      assert.areEqual(testClass.params,"");
+      assert.areEqual(testClass.type,"");
+      assert.areEqual(testClass.name,"");
+      assert.areEqual(rtnVal,"");
+      assert.areEqual(testClass.asserts,"");
+      assert.areEqual(testClass.tests,"");
+   }
+   public void MethodInfoTestCtor1_5()
+   {
+      ctor rtnVal = MethodInfo(0123);
+      assert.areEqual(testClass.startLine,"");
+      assert.areEqual(testClass.endLine,"");
+      assert.areEqual(testClass.classIndex,"");
+      assert.areEqual(testClass.access,"");
+      assert.areEqual(testClass.params,"");
+      assert.areEqual(testClass.type,"");
+      assert.areEqual(testClass.name,"");
+      assert.areEqual(rtnVal,"");
+      assert.areEqual(testClass.asserts,"");
+      assert.areEqual(testClass.tests,"");
+   }
+   public void endTestMeth1_0()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      end(0);
+      assert.areEqual(testClass0.endLine,"");
+   }
+   public void setLinesTestMeth1_0()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      setLines(0);
+      assert.areEqual(testClass0.lines,"");
+   }
+   public void setLinesTestMeth2_0()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      setLines(0);
+      assert.areEqual(testClass0.lines,"");
+   }
+   public void getLinesTestMeth1_0()
+   {
+      String rtnVal = getLines();
+      assert.areEqual(rtnVal,"");
+   }
+   public void isSameTestMeth1_0()
+   {
+      boolean rtnVal = isSame(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void isSameTestMeth1_1()
+   {
+      boolean rtnVal = isSame(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void isSameTestMeth1_2()
+   {
+      boolean rtnVal = isSame(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void isSameTestMeth1_3()
+   {
+      boolean rtnVal = isSame(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void getMethodTextTestMeth1_0()
+   {
+      String rtnVal = getMethodText();
+      assert.areEqual(rtnVal,"");
+   }
+   public void toStringTestMeth1_0()
+   {
+      String rtnVal = toString();
+      assert.areEqual(rtnVal,"");
+   }
+   public void setTestStateTestMeth1_0()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      setTestState(0);
+      assert.areEqual(testClass0.testState,"");
+   }
+   public void setCompileStateTestMeth1_0()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      setCompileState(0);
+      assert.areEqual(testClass0.compileState,"");
+   }
+   public void getIconStateTestMeth1_0()
+   {
+      String rtnVal = getIconState();
+      assert.areEqual(rtnVal,"");
+   }
+   public void stripTestNameTestMeth1_0()
+   {
+      String rtnVal = stripTestName(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void stripTestNameTestMeth1_1()
+   {
+      String rtnVal = stripTestName(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void getTestFirstLineTestMeth1_0()
+   {
+      String rtnVal = getTestFirstLine();
+      assert.areEqual(rtnVal,"");
+   }
+   public void getTestFirstLineTestMeth1_1()
+   {
+      String rtnVal = getTestFirstLine();
+      assert.areEqual(rtnVal,"");
+   }
+   public void copyLinesTestMeth1_0()
+   {
+      String[] rtnVal = copyLines();
+      assert.areEqual(rtnVal,"");
+   }
+   public void extractTestsTestMeth1_0()
+   {
+   }
+   public void getAllPathsTestMeth1_0()
+   {
+      String[] rtnVal = getAllPaths(0);
+      assert.areEqual(rtnVal,"");
+   }
+}
+class CodeNodeTests
+{
+   String code;
+   int parentLine;
+   int absLineNo;
+   int relLineNo;
+   int blockType;
+   int nPaths;
+   CodeNode parent;
+   int currPath;
+   LinkedList children;
+
+	   CodeNodeTests()
+	   {
+		   nPaths = 1;
+		   int lineNo = 0;
+		   code = "";
+		   children = new LinkedList();
+		   currPath = 0;
+	   }
+
+	   CodeNodeTests(String in)
+	   {
+		   this();
+		   String btPart = in.substring(3, in.indexOf("|"));
+		   String ln1 = in.substring(in.indexOf("L:"));
+		   String lnPart = ln1.substring(2, ln1.indexOf("|"));
+		   String ln2 = in.substring(in.indexOf("R:"));
+		   String lnPart2 = ln2.substring(2, ln2.indexOf("|"));
+		   String par1 = in.substring(in.indexOf("P:"));
+		   String pnPart = par1.substring(2, par1.indexOf("|"));
+		   code = in.substring(in.indexOf("\n") + 1, in.length());
+		   parentLine = Integer.parseInt(pnPart);
+		   blockType = Integer.parseInt(btPart);
+		   absLineNo = Integer.parseInt(lnPart);
+		   relLineNo = Integer.parseInt(lnPart2);
+	   }
+
+	   public void addChild(CodeNode node)
+	   {
+		   children.add(node);
+		   node.parent = this;
+	   }
+
+	   public String toString()
+	   {
+		   String rtnVal = "";
+		   rtnVal = "BlockType:" + blockType + "\n";
+		   rtnVal += "AbsLineNo:" + absLineNo + "\n";
+		   rtnVal += "RelLineNo:" + relLineNo + "\n";
+		   rtnVal += "ParentLine:" + parentLine + "\n";
+		   rtnVal += "nPaths:" + nPaths + "\n";
+		   rtnVal += "--------------------------------\n";
+		   rtnVal += code;
+		   rtnVal += "--------------------------------\n";
+		   return rtnVal;
+	   }
+
+	   public String getShortString()
+	   {
+		   String rtnVal;
+		   rtnVal = "P:" + parentLine + "A:" + absLineNo + "R:" + relLineNo + "T:" + blockType + "|";
+		   return rtnVal;
+	   }
+
+   public void CodeNodeTestCtor1_0()
+   {
+      CodeNodeTests testClass = new CodeNodeTests();
+      assert.areEqual(testClass.nPaths,"");
+      assert.areEqual(testClass.code,"");
+      assert.areEqual(testClass.children,"");
+      assert.areEqual(testClass.currPath,"");
+   }
+   public void CodeNodeTestCtor2_0()
+   {
+      CodeNodeTests testClass = new CodeNodeTests(0);
+      assert.areEqual(testClass.code,"");
+      assert.areEqual(testClass.parentLine,"");
+      assert.areEqual(testClass.blockType,"");
+      assert.areEqual(testClass.absLineNo,"");
+      assert.areEqual(testClass.relLineNo,"");
+   }
+   public void addChildTestMeth1_0()
+   {
+      addChild(0);
+      assert.areEqual(testClass,"");
+   }
+   public void toStringTestMeth1_0()
+   {
+      String rtnVal = toString();
+      assert.areEqual(rtnVal,"");
+   }
+   public void getShortStringTestMeth1_0()
+   {
+      String rtnVal = getShortString();
+      assert.areEqual(rtnVal,"");
+   }
+}
+class FunctionTreeTests
+{
+   CodeNode root;
+   int pcpLineNo;
+   int OTHER;
+   int IF;
+   int ELSE;
+   int SWITCH;
+   int CASE;
+   int DEFAULT;
+   int MULT_NODE;
+
+	   FunctionTreeTests(String[] meth)
+	   {
+		   pcpLineNo = 0;
+		   LinkedList parts = processCodePath(new LinkedList(), meth, 0, 0, 0);
+		   System.out.println("Done getting all " + parts.size() + " code paths.");
+		   String str2 = "";
+		   for(int i = 0; i < parts.size(); i++)
+		   {
+			   String str = (String) parts.get(i);
+			   CodeNode cn = new CodeNode(str);
+			   str2 += cn.getShortString();
+		   }
+		   //System.out.println(str1);
+		   System.out.println(str2);
+		   CodeNode[] nodes = extractNodes(parts);
+		   linkTree(nodes);
+		   makeEmptyElseNodes(nodes);
+		   aggregateCases(nodes);
+		   setupSubnodes(nodes);
+		   sumLeaves(root);
+		   System.out.println("nPaths = " + parts.size());
+		   System.out.println("Cyclo = " + root.nPaths);
+		   //printTree();
+	   }
+
+	   private CodeNode[] extractNodes(LinkedList codeParts)
+	   {
+		   CodeNode temp[] = new CodeNode[codeParts.size()];
+		   root = new CodeNode();
+		   //read the nodes
+		   for(int i = 0; i < codeParts.size(); i++)
+		   {
+			   String part = (String) codeParts.get(i);
+			   CodeNode node = new CodeNode(part);
+			   temp[i] = node;
+			   if(node.absLineNo == 0)
+				   root = node;
+			   //System.out.println(node);
+		   }
+		   return temp;
+	   }
+
+	   private void linkTree(CodeNode[] temp)
+	   {
+		   //link up the tree
+		   for(int i = 0; i < temp.length; i++)
+		   {
+			   if(temp[i] == root)
+				   continue;
+			   if(temp[i].parentLine == 0)
+			      root.addChild(temp[i]);
+			   else
+			   {
+				   for(int j = 0; j < temp.length; j++)
+				   {
+					   if(temp[j].absLineNo == temp[i].parentLine && i != j)
+						   temp[j].addChild(temp[i]);
+				   }
+			   }
+		   }
+	   }
+
+	   private void makeEmptyElseNodes(CodeNode[] temp)
+	   {
+		   int i = 0;
+		   while(true)
+		   {
+			  CodeNode[] lst = levelTraverse(i);
+			  if(lst.length == 0)
+				  break;
+			  for(int j = 0; j < lst.length; j++)
+			  {
+				  if(lst[j].blockType == IF)
+				  {
+					 //if you have a lone if statement
+					 if((j + 1) == lst.length || lst[j + 1].blockType != ELSE)
+					 {
+						 //add an empty else, then tie it to the given if
+						 CodeNode c = new CodeNode();
+						 c.blockType = ELSE;
+						 c.absLineNo = lst[j].absLineNo;
+						 c.relLineNo = lst[j].relLineNo;
+						 c.parent = lst[j].parent;
+						 c.parentLine = lst[j].parentLine;
+						 c.code = "";
+						 c.parent.addChild(c);
+					 }
+					 //else
+					 //{
+						 //tie the current else, by line number, to the given if
+						 //lst[j + 1].absLineNo = lst[j].absLineNo;
+						 //lst[j + 1].relLineNo = lst[j].relLineNo;
+					 //}
+				  }
+			  }
+			  i++;
+		   }
+		   //System.out.println("Done linking if-else.");
+	   }
+
+	   private void aggregateCases(CodeNode[] temp)
+	   {
+		   //continuous cases:  aggregate the code
+		   int i = 1;
+		   while(true)
+		   {
+			  CodeNode[] lst = levelTraverse(i);
+			  if(lst.length == 0)
+				  break;
+			  else
+			   {
+				   for(int j = 0; j < lst.length; j++)
+					   System.out.println(j + ":" + lst[j].getShortString());
+			   }
+			  //traverse a level
+			  for(int j = 0; j < lst.length; j++)
+			  {
+				  //look for switch statements
+				  if(lst[j].blockType == SWITCH)
+				  {
+					  CodeNode[] lst2 = new CodeNode[lst[j].children.size()];
+					  int lastCase = 0;
+					  //get each child case; look at the last absolute line
+					  for(int k = 0; k < lst[j].children.size(); k++)
+					  {
+						  lst2[k] = (CodeNode) lst[j].children.get(k);
+						  if(lst2[k].absLineNo > lastCase)
+							  lastCase = lst2[k].absLineNo;
+					  }
+					  //look for a continued case (one without a "break" at the end)
+					  for(int k = 0; k < lst2.length; k++)
+					  {
+						  if(lst2[k].blockType == CASE && lst2[k].code.indexOf(" break;") == -1)
+						  {
+							  //look for all possible following cases
+							  int lastLine = lst2[k].absLineNo + 1; 
+							  //go through each line following the case
+							  while(lastLine <= lastCase)
+							  {
+								  //look for a case beginning on this line
+								  for(int l = 0; l < lst2.length; l++)
+								  {
+									  if(lst2[l].absLineNo == lastLine)
+									  {
+										  //found a case -- join the code
+										  lst2[k].code += lst2[l].code;
+										  //continue moving forward if there is no "break" at the end of this case
+										  if(lst2[l].code.indexOf(" break;") == -1)
+											  lastLine++;
+										  else
+											  lastLine = lastCase;
+									  }
+								  }
+								  lastLine++;
+							  }
+						  }
+					  }
+					  //wipe out the "breaks" to make the case compilable
+					  for(int k = 0; k < lst2.length; k++)
+					  {
+						  int brk = lst2[k].code.lastIndexOf(" break;");
+						  if(brk > 0)
+						  {
+							  lst2[k].code = lst2[k].code.substring(0, brk);
+						  }
+					  }
+				  }
+			  }
+			  i++;
+		   }
+	   }
+
+	   private void setupSubnodes(CodeNode[] temp)
+	   {
+		   //set up sub-nodes: these nodes are intermediary multipliers
+		   int i = 1;
+		   while(true)
+		   {
+			  CodeNode[] lst = levelTraverse(i);
+			  System.out.println("Level " + i + " has " + lst.length + " nodes.");
+			  if(lst.length == 0)
+				  break;
+			  //traverse a level
+			  CodeNode[] newLvl = new CodeNode[lst.length];
+			  int l = 0;
+			  for(int j = 0; j < lst.length; j++)
+			  {
+				 //switch nodes: make them into an intermediary node and ignore a re-link process
+				 if(lst[j].blockType == SWITCH)
+				 {
+					 lst[j].blockType = -1;
+					 continue;
+				 }
+				 //look for a node with the same line number in our intermediate list
+				 boolean found = false; 
+				 for(int k = 0; k < newLvl.length; k++)
+				 {
+					 if(newLvl[k] != null && newLvl[k].relLineNo == lst[j].relLineNo && newLvl[k].parentLine == lst[j].parentLine)
+					 {
+						 //if one is there, simply move the child from the parent to the
+						 //intermediate node
+						 lst[j].parent.children.remove(lst[j]);
+						 newLvl[k].addChild(lst[j]);
+						 found = true;
+						 break;
+					 }
+				 }
+				 if(found == false)
+				 {
+					//else create the new node, attach it to the parent, and attach the
+					//current node to the new child
+					newLvl[l] = new CodeNode();
+					newLvl[l].absLineNo = lst[j].absLineNo;
+					newLvl[l].relLineNo = lst[j].relLineNo;
+					newLvl[l].parentLine = lst[j].parentLine;
+					newLvl[l].blockType = -1;
+					
+					lst[j].parent.addChild(newLvl[l]);
+					lst[j].parent.children.remove(lst[j]);
+					newLvl[l].addChild(lst[j]);
+					l++;
+				 }
+			  }
+			  //step down two levels
+			  i += 2;
+		   }
+	   }
+
+	   private synchronized LinkedList processCodePath(LinkedList paths, String[] meth, int lineNo, int blockType, int parentLineNo)
+	   {
+		  //add the new entry
+		  /*if(pathDepth > -1)
+			  paths.add(new String((String) paths.get(pathDepth)));
+		  else*/
+		  //paths.add(new String("|L:" + lineNo + "|P:" + parentLineNo +"|\n"));
+		  String currPath = new String("BT:" + blockType + "|L:" + pcpLineNo + "|R:" + lineNo + "|P:" + parentLineNo +"|\n");
+		  String tokens[] = {"else", "if(", "switch(", "case ", "default:"/*, "do", "while(", "for("*/};
+		  boolean endedBlock = false;
+		  String line;
+		  int branchPos = -1;
+		  int blockDepth = 0;
+		  int relativeLine = 0;
+		  int parLine = pcpLineNo;
+		  int i = 0;
+		  
+		  while(pcpLineNo < meth.length)
+		  {
+			 i = pcpLineNo;
+			 line = new String(meth[i]);
+			 line = WhiteboxUtils.removeNonCode(line, true);
+			 int foundNum = -1;
+			 int ifEnd = 0;
+			 //line = line.trim();
+			 //if you start a new block, process it
+			 for(int j = 0; j < tokens.length; j++)
+			 {
+				 branchPos = line.indexOf(tokens[j]);
+				 if(branchPos > 0 && line.charAt(branchPos - 1) >= '0')
+					 continue;
+				 if(branchPos > -1)
+				 {
+					 foundNum = j;
+					 break;
+				 }
+			 }
+			 //if(foundNum >= 0)
+				 //System.out.println("Found block of type:" + (foundNum) + " at line " + i + " from parent " + parLine);
+			 switch(foundNum)
+			 {
+			 case 0:  //else
+				 ifEnd = branchPos + 4;
+				 meth[i] = meth[i].substring(0, branchPos) + "/*else*/" + meth[i].substring(ifEnd);
+				 relativeLine--;
+				 processCodePath(paths, meth, relativeLine, ELSE, parLine);
+				 relativeLine++;
+				 break;
+			 case 1:  //if
+				 ifEnd = WhiteboxUtils.findClosingParen(line, branchPos + 4) + 1;
+				 String condition = meth[i].substring(branchPos, ifEnd);
+				 condition = condition.substring(condition.indexOf("if(") + 2);
+				 meth[i] = meth[i].substring(0, branchPos) + "/* because" + condition + " */" + meth[i].substring(ifEnd);
+				 processCodePath(paths, meth, relativeLine, IF, parLine);
+				 if(i == parLine && blockType == ELSE) //else-if postprocessing
+				 {
+					 //System.out.println("Ended block type " + blockType + " starting on line " + parLine + " on line " + pcpLineNo);
+					 paths.add(currPath);
+					 return paths;
+				 }
+				 else
+					 relativeLine++;
+				 break;
+			 case 2:  //switch
+				 ifEnd = WhiteboxUtils.findClosingParen(line, branchPos + 8) + 1;
+				 meth[i] = meth[i].substring(0, branchPos) + "/* switch on " + meth[i].substring(branchPos + 7, ifEnd) + " */" + meth[i].substring(ifEnd);
+				 processCodePath(paths, meth, relativeLine, SWITCH, parLine);
+				 relativeLine++;
+				 break;
+			 case 3:  //case
+				 if(blockType == CASE)  // don't process cases within cases
+				 {
+					 //System.out.println("Ended block type " + blockType + " starting on line " + parLine + " on line " + pcpLineNo);
+					 paths.add(currPath);
+					 return paths;
+				 }
+				 else
+				 {
+					 ifEnd = line.indexOf(":", branchPos + 6) + 1;
+					 int caseEnd = line.indexOf("case ") + 5;
+					 meth[i] = meth[i].substring(0, branchPos) + "/* value is " + meth[i].substring(caseEnd, ifEnd)  + " */" + meth[i].substring(ifEnd);
+					 relativeLine = 2;
+					 processCodePath(paths, meth, relativeLine, CASE, parLine);
+					 relativeLine++;
+				 }
+				 break;
+			 case 4:  //"default"
+				 if(blockType == CASE)  // don't process cases within cases
+				 {
+					 //System.out.println("Ended block type " + blockType + " starting on line " + parLine + " on line " + pcpLineNo);
+					 paths.add(currPath);
+					 return paths;
+				 }
+				 else
+				 {
+					 ifEnd = line.indexOf(":", branchPos + 7) + 1;
+					 meth[i] = meth[i].substring(0, branchPos) + meth[i].substring(ifEnd);
+					 relativeLine = 2;
+					 processCodePath(paths, meth, relativeLine, DEFAULT, parLine);
+					 relativeLine++;
+				 }
+				 break;
+			 case -1:  //nothing
+				 switch(blockType)
+				 {
+				    case 0:
+				       if(line.indexOf("}") >= 0)
+				       {
+				    	   if(blockDepth == 0)
+				    	      endedBlock = true;
+				    	   else
+				    		  blockDepth--;
+				       }
+				       else if(line.indexOf("{") >= 0)
+				    	   blockDepth++;
+				 	   break;
+				    //if block
+				 	case IF:
+				 	case ELSE:
+				 	   if(line.indexOf("{") >= 0)
+				 	   {
+				 	      blockType = 0;
+				 	   }
+				 	   else if(line.trim().endsWith(";"))
+				 		  endedBlock = true;
+				 	   else if(pcpLineNo > parLine)
+				 	   {
+				 		   //truncated if-else: just return the path without adding anything
+				 		   //or moving forward to the next line
+				 		  //System.out.println("Ended block type " + blockType + " starting on line " + parLine + " on line " + pcpLineNo);
+				 		   paths.add(currPath);
+				 		   return paths;
+				 	   }
+				 	   break;
+				 	//switch block
+				 	case SWITCH:
+				 	   if(line.indexOf("}") >= 0)
+				 		   endedBlock = true;
+				 	   break;
+				    //case block
+				 	case CASE:
+				 	case DEFAULT:
+				 		if(line.indexOf("{") >= 0)
+				 		{
+					 	   blockType = 0;
+					 	   break;
+				 		}
+					 	else if(line.indexOf("break;") >= 0)
+					 	   endedBlock = true;
+				 		break;
+				 }
+				 currPath += meth[i] + "\n";
+				 //when you're done you're done
+				 if(endedBlock)
+				 {
+					 //System.out.println("Ended block type " + blockType + " starting on line " + parLine + " on line " + pcpLineNo);
+					 paths.add(currPath);
+					 pcpLineNo++;
+					 return paths;
+				 }
+				 else
+				 {
+					 relativeLine++;
+					 pcpLineNo++;
+				 }
+				 break;
+			 }
+		  }
+		//if you end a block, add the block to the list and return
+		  paths.add(currPath);
+		  return paths;
+	   }
+
+	   public String[] getCodePaths()
+	   {
+		   String[] rtnVal = new String[root.nPaths];
+		   LinkedList path;
+		   for(int i = 0; i < root.nPaths; i++)
+		   {
+			  path = new LinkedList();
+			  path.add(root);
+			  int startLevel = 0;
+			  int endLevel = 1;
+			  //int[] prevPathSel = new int[1];
+			  root.currPath = i;
+			  while(true)
+			  {
+				  //push the level
+				  for(int j = startLevel; j < endLevel; j++)
+				  {
+					  CodeNode d = (CodeNode) path.get(j);
+					  path.addAll(d.children);
+				  }
+				  startLevel = endLevel;
+				  endLevel = path.size();
+				  if(startLevel == endLevel)
+					  break;
+				  //determine the path using i
+				  int childNum = 0;
+				  for(int j = startLevel; j < endLevel; j++)
+				  {
+					  //calculate the number of subnodes on each path later than the selected path
+					  //get the parent
+					  CodeNode parent = (CodeNode) path.get(j);
+					  parent = parent.parent;
+					  
+					  //calculate the number of paths later on underneath the parent
+					  int prodPrev = 1;
+					  CodeNode e = (CodeNode) parent.children.get(childNum);
+					  for(int k = childNum; k < parent.children.size() - 1; k++)
+					  {
+						  CodeNode f = (CodeNode) parent.children.get(k + 1);
+						  prodPrev *= f.nPaths;						
+					  }
+					  //System.out.println("NDI:" + startLevel + " CN:" + childNum + " PP:" + prodPrev);
+					  
+					  if(childNum == parent.children.size() - 1)
+					  {
+						//the child is the last node: just grab whatever is left from the parent
+						  e.currPath = parent.currPath;
+						  childNum = 0;
+					  }
+					  else
+					  {
+						//use up "path" from the parent
+						  e.currPath = parent.currPath / prodPrev;
+						  parent.currPath %= prodPrev;
+						  childNum++;
+					  }
+				  }
+				  //printPath();
+				  //add the path, replacing using the selected nodes only
+				  //NOTE: this part selects one child node, rather than set the path for all child nodes,
+				  //so this part is different from above
+				  for(int j = startLevel; j < endLevel; j++)
+				  {
+					  CodeNode d = (CodeNode) path.get(j);
+					  int sum = 0;
+					  for(int k = d.children.size() - 1; k >= 0; k--)
+					  {
+						  CodeNode e = (CodeNode) d.children.get(k);
+						  sum += e.nPaths;
+						  if(d.currPath < sum)
+						  {
+							 path.add(e);
+							 e.currPath = d.currPath - sum + e.nPaths;  //e.currpath = currpath - the sum of all later paths
+							 break;
+						  }
+					  }
+				  }
+				  startLevel = endLevel;
+				  endLevel = path.size();
+			  }
+			  //printPath();
+			  //System.out.println("Test:" + i + "********************************");
+			  //for(int j = 0; j < path.size(); j++)
+				  //System.out.println(path.get(j));
+			  //System.out.println(i + "****************************");
+				  rtnVal[rtnVal.length - 1 - i] = buildString(path, 0, (CodeNode) path.get(0));
+			  //System.out.println(rtnVal[i]);
+			  //System.out.println(i + "****************************");
+		   }
+		   return rtnVal;
+	   }
+
+	   public void printPath()
+	   {
+		   int i = 0;
+		   while(true)
+		   {
+			   CodeNode lst[] = this.levelTraverse(i);
+			   if(lst.length == 0)
+				   break;
+			   else
+			   {
+				   for(int j = 0; j < lst.length; j++)
+				   {
+					   System.out.print(lst[j].currPath + "/" + lst[j].nPaths + "|");
+				   }
+				   System.out.println("");
+				   i++;
+			   }
+		   }
+	   }
+
+	   private String buildString(LinkedList codePath, int parent, CodeNode parNode)
+	   {
+		   String rtnVal = "";
+		   //int relLine = 0;
+		   String[] all = parNode.code.split("\n");
+		   int i = 0;
+		   int line = 0;
+		   
+		   while(true)
+		   {
+			   boolean found = false;
+			   for(int j = 0; j < codePath.size(); j++)
+			   {
+				   CodeNode d = (CodeNode) codePath.get(j);
+				   if(d == parNode)
+					   continue;
+				   if(d.parentLine == parNode.absLineNo && d.relLineNo == line && d.blockType != -1)
+				   {
+					   found = true;   
+					   rtnVal += buildString(codePath, line, d);
+					   break;
+				   }
+				   
+			   }
+			   if(found == false)
+			   {
+				   rtnVal += all[i] + "\n";
+				   i++;
+				   if(i == all.length)
+					   break;
+			   }
+			   line++;
+		   }
+		   return rtnVal;
+	   }
+
+	   private int sumLeaves(CodeNode c)
+	   {
+		   int sum = 0;
+		   for(int i = 0; i < c.children.size(); i++)
+		   {
+			   CodeNode d = (CodeNode) c.children.get(i);
+			   sumLeaves(d);
+		   }
+		   for(int i = 0; i < c.children.size(); i++)
+		   {
+			   CodeNode d = (CodeNode) c.children.get(i);
+			   if(d.blockType == -1)
+			   {
+				   if(sum == 0)
+					   sum = 1;
+				   sum *= d.nPaths;
+			   }
+			   else
+				   sum += d.nPaths;
+		   }
+		   if(sum == 0)
+			   sum = 1;
+		   c.nPaths = sum;
+		   return sum;
+	   }
+
+	   private CodeNode[] levelTraverse(int level)
+	   {
+		   int i = 0;
+		   int j = 0;
+		   LinkedList list = new LinkedList();
+		   list.add(root);
+		   while(i < level || level == -1)
+		   {
+			   int k = list.size();
+			   if(j == k)
+				   break;
+			   for(int l = j; l < k; l++)
+			   {
+				   CodeNode n = (CodeNode) list.get(l);
+				   list.addAll(n.children);
+			   }
+			   j = k;
+			   i++;
+		   }
+		   int k = 0;
+		   if(level == -1)
+			   k = 0;
+		   else
+			   k = j;
+		   i = 0;
+		   CodeNode arr[] = new CodeNode[list.size() - k];
+		   while(k < list.size())
+		   {
+			   arr[i] = (CodeNode) list.get(k);
+			   i++;
+			   k++;
+		   }
+		   return arr;
+	   }
+
+	   private void printTree()
+	   {
+		  int i = 0;
+	      while(true)
+	      {
+	    	 CodeNode[] arr = levelTraverse(i);
+	    	 i++;
+	    	 if(arr.length == 0)
+	    		 break;
+	    	 for(int j = 0; j < arr.length; j++)
+	    	 {
+	    		 System.out.println("=======================================");
+	    		 System.out.print(arr[j].toString());
+	    		 System.out.println("=======================================");
+	    	 }
+	    	 System.out.println("############ End of level ####################");
+	      }
+	   }
+
+   public void FunctionTreeTestCtor1_0()
+   {
+      FunctionTreeTests testClass = new FunctionTreeTests(0);
+      assert.areEqual(testClass.pcpLineNo,"");
+   }
+   public void extractNodesTestMeth1_0()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      CodeNode[] rtnVal = extractNodes(0);
+      assert.areEqual(testClass0.root,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void extractNodesTestMeth1_1()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      CodeNode[] rtnVal = extractNodes(0);
+      assert.areEqual(testClass0.root,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void linkTreeTestMeth1_0()
+   {
+   }
+   public void linkTreeTestMeth1_1()
+   {
+   }
+   public void linkTreeTestMeth1_2()
+   {
+   }
+   public void linkTreeTestMeth1_3()
+   {
+   }
+   public void linkTreeTestMeth1_4()
+   {
+   }
+   public void linkTreeTestMeth1_5()
+   {
+   }
+   public void makeEmptyElseNodesTestMeth1_0()
+   {
+      makeEmptyElseNodes(0);
+      assert.areEqual(testClass,"");
+      assert.areEqual(testClass,"");
+      assert.areEqual(testClass,"");
+      assert.areEqual(testClass,"");
+      assert.areEqual(testClass,"");
+      assert.areEqual(testClass,"");
+   }
+   public void makeEmptyElseNodesTestMeth1_1()
+   {
+   }
+   public void makeEmptyElseNodesTestMeth1_2()
+   {
+   }
+   public void makeEmptyElseNodesTestMeth1_3()
+   {
+      makeEmptyElseNodes(0);
+      assert.areEqual(testClass,"");
+      assert.areEqual(testClass,"");
+      assert.areEqual(testClass,"");
+      assert.areEqual(testClass,"");
+      assert.areEqual(testClass,"");
+      assert.areEqual(testClass,"");
+   }
+   public void makeEmptyElseNodesTestMeth1_4()
+   {
+   }
+   public void makeEmptyElseNodesTestMeth1_5()
+   {
+   }
+   public void aggregateCasesTestMeth1_0()
+   {
+      aggregateCases(0);
+      assert.areEqual(testClass,"");
+   }
+   public void aggregateCasesTestMeth1_1()
+   {
+   }
+   public void aggregateCasesTestMeth1_2()
+   {
+      aggregateCases(0);
+      assert.areEqual(testClass,"");
+   }
+   public void aggregateCasesTestMeth1_3()
+   {
+   }
+   public void aggregateCasesTestMeth1_4()
+   {
+      aggregateCases(0);
+      assert.areEqual(testClass,"");
+   }
+   public void aggregateCasesTestMeth1_5()
+   {
+   }
+   public void aggregateCasesTestMeth1_6()
+   {
+      aggregateCases(0);
+      assert.areEqual(testClass,"");
+   }
+   public void aggregateCasesTestMeth1_7()
+   {
+   }
+   public void aggregateCasesTestMeth1_8()
+   {
+      aggregateCases(0);
+      assert.areEqual(testClass,"");
+   }
+   public void aggregateCasesTestMeth1_9()
+   {
+   }
+   public void aggregateCasesTestMeth1_10()
+   {
+      aggregateCases(0);
+      assert.areEqual(testClass,"");
+   }
+   public void aggregateCasesTestMeth1_11()
+   {
+   }
+   public void aggregateCasesTestMeth1_12()
+   {
+      aggregateCases(0);
+      assert.areEqual(testClass,"");
+   }
+   public void aggregateCasesTestMeth1_13()
+   {
+   }
+   public void aggregateCasesTestMeth1_14()
+   {
+      aggregateCases(0);
+      assert.areEqual(testClass,"");
+   }
+   public void aggregateCasesTestMeth1_15()
+   {
+   }
+   public void aggregateCasesTestMeth1_16()
+   {
+   }
+   public void aggregateCasesTestMeth1_17()
+   {
+      aggregateCases(0);
+      assert.areEqual(testClass,"");
+   }
+   public void aggregateCasesTestMeth1_18()
+   {
+   }
+   public void aggregateCasesTestMeth1_19()
+   {
+      aggregateCases(0);
+      assert.areEqual(testClass,"");
+   }
+   public void aggregateCasesTestMeth1_20()
+   {
+   }
+   public void aggregateCasesTestMeth1_21()
+   {
+      aggregateCases(0);
+      assert.areEqual(testClass,"");
+   }
+   public void aggregateCasesTestMeth1_22()
+   {
+   }
+   public void aggregateCasesTestMeth1_23()
+   {
+      aggregateCases(0);
+      assert.areEqual(testClass,"");
+   }
+   public void aggregateCasesTestMeth1_24()
+   {
+   }
+   public void aggregateCasesTestMeth1_25()
+   {
+      aggregateCases(0);
+      assert.areEqual(testClass,"");
+   }
+   public void aggregateCasesTestMeth1_26()
+   {
+   }
+   public void aggregateCasesTestMeth1_27()
+   {
+      aggregateCases(0);
+      assert.areEqual(testClass,"");
+   }
+   public void aggregateCasesTestMeth1_28()
+   {
+   }
+   public void aggregateCasesTestMeth1_29()
+   {
+      aggregateCases(0);
+      assert.areEqual(testClass,"");
+   }
+   public void aggregateCasesTestMeth1_30()
+   {
+   }
+   public void aggregateCasesTestMeth1_31()
+   {
+      aggregateCases(0);
+      assert.areEqual(testClass,"");
+   }
+   public void aggregateCasesTestMeth1_32()
+   {
+   }
+   public void aggregateCasesTestMeth1_33()
+   {
+   }
+   public void setupSubnodesTestMeth1_0()
+   {
+      setupSubnodes(0);
+      assert.areEqual(testClass,"");
+      assert.areEqual(testClass,"");
+      assert.areEqual(testClass,"");
+      assert.areEqual(testClass,"");
+      assert.areEqual(testClass,"");
+   }
+   public void setupSubnodesTestMeth1_1()
+   {
+      setupSubnodes(0);
+      assert.areEqual(testClass,"");
+   }
+   public void setupSubnodesTestMeth1_2()
+   {
+      setupSubnodes(0);
+      assert.areEqual(testClass,"");
+      assert.areEqual(testClass,"");
+      assert.areEqual(testClass,"");
+      assert.areEqual(testClass,"");
+      assert.areEqual(testClass,"");
+   }
+   public void setupSubnodesTestMeth1_3()
+   {
+      setupSubnodes(0);
+      assert.areEqual(testClass,"");
+   }
+   public void setupSubnodesTestMeth1_4()
+   {
+      setupSubnodes(0);
+      assert.areEqual(testClass,"");
+      assert.areEqual(testClass,"");
+      assert.areEqual(testClass,"");
+      assert.areEqual(testClass,"");
+   }
+   public void setupSubnodesTestMeth1_5()
+   {
+   }
+   public void setupSubnodesTestMeth1_6()
+   {
+      setupSubnodes(0);
+      assert.areEqual(testClass,"");
+      assert.areEqual(testClass,"");
+      assert.areEqual(testClass,"");
+      assert.areEqual(testClass,"");
+   }
+   public void setupSubnodesTestMeth1_7()
+   {
+   }
+   public void setupSubnodesTestMeth1_8()
+   {
+      setupSubnodes(0);
+      assert.areEqual(testClass,"");
+      assert.areEqual(testClass,"");
+      assert.areEqual(testClass,"");
+      assert.areEqual(testClass,"");
+      assert.areEqual(testClass,"");
+   }
+   public void setupSubnodesTestMeth1_9()
+   {
+      setupSubnodes(0);
+      assert.areEqual(testClass,"");
+   }
+   public void setupSubnodesTestMeth1_10()
+   {
+      setupSubnodes(0);
+      assert.areEqual(testClass,"");
+      assert.areEqual(testClass,"");
+      assert.areEqual(testClass,"");
+      assert.areEqual(testClass,"");
+      assert.areEqual(testClass,"");
+   }
+   public void setupSubnodesTestMeth1_11()
+   {
+      setupSubnodes(0);
+      assert.areEqual(testClass,"");
+   }
+   public void setupSubnodesTestMeth1_12()
+   {
+      setupSubnodes(0);
+      assert.areEqual(testClass,"");
+      assert.areEqual(testClass,"");
+      assert.areEqual(testClass,"");
+      assert.areEqual(testClass,"");
+   }
+   public void setupSubnodesTestMeth1_13()
+   {
+   }
+   public void setupSubnodesTestMeth1_14()
+   {
+      setupSubnodes(0);
+      assert.areEqual(testClass,"");
+      assert.areEqual(testClass,"");
+      assert.areEqual(testClass,"");
+      assert.areEqual(testClass,"");
+   }
+   public void setupSubnodesTestMeth1_15()
+   {
+   }
+   public void processCodePathTestMeth1_0()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_1()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_2()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_3()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_4()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_5()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_6()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_7()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_8()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_9()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_10()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_11()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_12()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_13()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_14()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_15()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_16()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_17()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_18()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_19()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_20()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_21()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_22()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_23()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_24()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_25()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_26()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_27()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_28()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_29()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_30()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_31()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_32()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_33()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_34()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_35()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_36()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_37()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_38()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_39()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_40()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_41()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_42()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_43()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_44()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_45()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_46()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_47()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_48()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_49()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_50()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_51()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_52()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_53()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_54()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_55()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_56()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_57()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_58()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_59()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_60()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_61()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_62()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_63()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_64()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_65()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_66()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_67()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_68()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_69()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_70()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_71()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_72()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_73()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_74()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_75()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_76()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_77()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_78()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_79()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_80()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_81()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_82()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_83()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_84()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_85()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_86()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_87()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_88()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_89()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_90()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_91()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_92()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_93()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_94()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_95()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_96()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_97()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_98()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_99()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_100()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_101()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_102()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_103()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_104()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_105()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_106()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_107()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_108()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_109()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_110()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_111()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_112()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_113()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_114()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_115()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_116()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_117()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_118()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_119()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_120()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_121()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_122()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_123()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_124()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_125()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_126()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_127()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_128()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_129()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_130()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_131()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_132()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_133()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_134()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_135()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_136()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_137()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_138()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_139()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_140()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_141()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_142()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_143()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_144()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_145()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_146()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_147()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_148()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_149()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_150()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_151()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_152()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_153()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_154()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_155()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_156()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_157()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_158()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void processCodePathTestMeth1_159()
+   {
+      MethodInfo testClass0 = new MethodInfoTest();
+      LinkedList rtnVal = processCodePath(01234);
+      assert.areEqual(testClass0.line,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void getCodePathsTestMeth1_0()
+   {
+      CodeNode testClass0 = new CodeNodeTest();
+      MethodInfo testClass1 = new MethodInfoTest();
+      String[] rtnVal = getCodePaths();
+      assert.areEqual(testClass0.currPath,"");
+      assert.areEqual(testClass1.parent,"");
+      assert.areEqual(testClass,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void getCodePathsTestMeth1_1()
+   {
+      CodeNode testClass0 = new CodeNodeTest();
+      MethodInfo testClass1 = new MethodInfoTest();
+      String[] rtnVal = getCodePaths();
+      assert.areEqual(testClass0.currPath,"");
+      assert.areEqual(testClass1.parent,"");
+      assert.areEqual(testClass,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void getCodePathsTestMeth1_2()
+   {
+      CodeNode testClass0 = new CodeNodeTest();
+      MethodInfo testClass1 = new MethodInfoTest();
+      String[] rtnVal = getCodePaths();
+      assert.areEqual(testClass0.currPath,"");
+      assert.areEqual(testClass1.parent,"");
+      assert.areEqual(testClass,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void getCodePathsTestMeth1_3()
+   {
+      CodeNode testClass0 = new CodeNodeTest();
+      MethodInfo testClass1 = new MethodInfoTest();
+      String[] rtnVal = getCodePaths();
+      assert.areEqual(testClass0.currPath,"");
+      assert.areEqual(testClass1.parent,"");
+      assert.areEqual(testClass,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void getCodePathsTestMeth1_4()
+   {
+      CodeNode testClass0 = new CodeNodeTest();
+      MethodInfo testClass1 = new MethodInfoTest();
+      String[] rtnVal = getCodePaths();
+      assert.areEqual(testClass0.currPath,"");
+      assert.areEqual(testClass1.parent,"");
+      assert.areEqual(testClass,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void getCodePathsTestMeth1_5()
+   {
+      CodeNode testClass0 = new CodeNodeTest();
+      MethodInfo testClass1 = new MethodInfoTest();
+      String[] rtnVal = getCodePaths();
+      assert.areEqual(testClass0.currPath,"");
+      assert.areEqual(testClass1.parent,"");
+      assert.areEqual(testClass,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void getCodePathsTestMeth1_6()
+   {
+      CodeNode testClass0 = new CodeNodeTest();
+      MethodInfo testClass1 = new MethodInfoTest();
+      String[] rtnVal = getCodePaths();
+      assert.areEqual(testClass0.currPath,"");
+      assert.areEqual(testClass1.parent,"");
+      assert.areEqual(testClass,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void getCodePathsTestMeth1_7()
+   {
+      CodeNode testClass0 = new CodeNodeTest();
+      MethodInfo testClass1 = new MethodInfoTest();
+      String[] rtnVal = getCodePaths();
+      assert.areEqual(testClass0.currPath,"");
+      assert.areEqual(testClass1.parent,"");
+      assert.areEqual(testClass,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void printPathTestMeth1_0()
+   {
+   }
+   public void printPathTestMeth1_1()
+   {
+   }
+   public void buildStringTestMeth1_0()
+   {
+      String rtnVal = buildString(012);
+      assert.areEqual(rtnVal,"");
+   }
+   public void buildStringTestMeth1_1()
+   {
+      String rtnVal = buildString(012);
+      assert.areEqual(rtnVal,"");
+   }
+   public void buildStringTestMeth1_2()
+   {
+      String rtnVal = buildString(012);
+      assert.areEqual(rtnVal,"");
+   }
+   public void buildStringTestMeth1_3()
+   {
+      String rtnVal = buildString(012);
+      assert.areEqual(rtnVal,"");
+   }
+   public void buildStringTestMeth1_4()
+   {
+      String rtnVal = buildString(012);
+      assert.areEqual(rtnVal,"");
+   }
+   public void buildStringTestMeth1_5()
+   {
+      String rtnVal = buildString(012);
+      assert.areEqual(rtnVal,"");
+   }
+   public void buildStringTestMeth1_6()
+   {
+      String rtnVal = buildString(012);
+      assert.areEqual(rtnVal,"");
+   }
+   public void buildStringTestMeth1_7()
+   {
+      String rtnVal = buildString(012);
+      assert.areEqual(rtnVal,"");
+   }
+   public void buildStringTestMeth1_8()
+   {
+      String rtnVal = buildString(012);
+      assert.areEqual(rtnVal,"");
+   }
+   public void buildStringTestMeth1_9()
+   {
+      String rtnVal = buildString(012);
+      assert.areEqual(rtnVal,"");
+   }
+   public void buildStringTestMeth1_10()
+   {
+      String rtnVal = buildString(012);
+      assert.areEqual(rtnVal,"");
+   }
+   public void buildStringTestMeth1_11()
+   {
+      String rtnVal = buildString(012);
+      assert.areEqual(rtnVal,"");
+   }
+   public void sumLeavesTestMeth1_0()
+   {
+      int rtnVal = sumLeaves(0);
+      assert.areEqual(testClass,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void sumLeavesTestMeth1_1()
+   {
+      int rtnVal = sumLeaves(0);
+      assert.areEqual(testClass,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void sumLeavesTestMeth1_2()
+   {
+      int rtnVal = sumLeaves(0);
+      assert.areEqual(testClass,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void sumLeavesTestMeth1_3()
+   {
+      int rtnVal = sumLeaves(0);
+      assert.areEqual(testClass,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void sumLeavesTestMeth1_4()
+   {
+      int rtnVal = sumLeaves(0);
+      assert.areEqual(testClass,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void sumLeavesTestMeth1_5()
+   {
+      int rtnVal = sumLeaves(0);
+      assert.areEqual(testClass,"");
+      assert.areEqual(rtnVal,"");
+   }
+   public void levelTraverseTestMeth1_0()
+   {
+      CodeNode[] rtnVal = levelTraverse(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void levelTraverseTestMeth1_1()
+   {
+      CodeNode[] rtnVal = levelTraverse(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void levelTraverseTestMeth1_2()
+   {
+      CodeNode[] rtnVal = levelTraverse(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void levelTraverseTestMeth1_3()
+   {
+      CodeNode[] rtnVal = levelTraverse(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void printTreeTestMeth1_0()
+   {
+   }
+   public void printTreeTestMeth1_1()
+   {
+   }
+}
+class MethodListTests
+{
+   int classIndex;
+
+   MethodListTests(int index)
+   {
+      super();
+      classIndex = index;
+   }
+
+   public MethodInfo getMethod(int index)
+   {
+      if(index < size())
+      {
+         return (MethodInfo) super.get(index);
+      }
+      else
+         return null;
+   }
+
+   public MethodInfo getFirstMethod()
+   {
+      return (MethodInfo) super.getFirst();
+   }
+
+   public MethodInfo getLastMethod()
+   {
+      return (MethodInfo) super.getLast();
+   }
+
+   public void replace(int index, MethodInfo mi)
+   {
+      set(index, mi);
+   }
+
+   public boolean isTest(MethodInfo mi)
+   {
+      String str = stripTestName(mi.name);
+      if(str != null)
+      {
+         for(int i = 0; i < size(); i++)
+         {
+            if(getMethod(i).name.equals(str))
+               return true;
+         }
+         return false;
+      }
+      else
+         return false;
+   }
+
+   public void removeAllNonTestMethods()
+   {
+      int i = 0;
+      while(i < size())
+      {
+         if(isTest(getMethod(i)))
+            remove(i);
+         else
+            i++;
+      }
+   }
+
+   private String stripTestName(String in)
+   {
+      int testIndex = in.lastIndexOf("Test");
+      if(testIndex > 0)
+         return in.substring(0, testIndex);
+      else
+         return null;
+   }
+
+   private int getMethodNameIndex(String in)
+   {
+	   int testIndex = in.lastIndexOf("Test");
+	   if(testIndex > 0)
+	   {
+		  int in2 = in.lastIndexOf("_");
+	      if(in2 < testIndex)
+	    	  in2 = in.length();
+		  in = in.substring(testIndex + 8, in2);
+	      Integer rtnVal = Integer.parseInt(in);
+	      return rtnVal.intValue();
+	   }
+	   return -1;
+   }
+
+   public MethodInfo getMethodForTest(String in)
+   {
+	  int mNumber = getMethodNameIndex(in);
+      String str = stripTestName(in);
+      int num = 1;
+      if(str == null || mNumber == -1)
+         return null;
+      for(int i = 0; i < size(); i++)
+      {
+         if(getMethod(i).name.equals(str))
+         {
+        	if(mNumber == num)
+               return getMethod(i);
+        	else
+        		num++;
+         }
+         else
+        	 num = 1;
+      }
+      return null;
+   }
+
+   public MethodInfo getMethodWithName(String in)
+   {
+      for(int i = 0; i < size(); i++)
+      {
+         if(getMethod(i).name.equals(in))
+            return getMethod(i);
+      }
+      return null;
+   }
+
+   public int countMethodsWithName(MethodInfo in)
+   {
+	   int rtnVal = 1;
+	   for(int i = 0; i < size(); i++)
+	   {
+	      if(getMethod(i) == in)
+	    	  return rtnVal;
+		   if(getMethod(i).name.equals(in.name))
+			   rtnVal++;
+	   }
+	   return rtnVal;
+   }
+
+   public void MethodListTestCtor1_0()
+   {
+      MethodListTests testClass = new MethodListTests(0);
+      assert.areEqual(testClass.classIndex,"");
+   }
+   public void getMethodTestMeth1_0()
+   {
+      MethodInfo rtnVal = getMethod(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void getMethodTestMeth1_1()
+   {
+      MethodInfo rtnVal = getMethod(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void getFirstMethodTestMeth1_0()
+   {
+      MethodInfo rtnVal = getFirstMethod();
+      assert.areEqual(rtnVal,"");
+   }
+   public void getLastMethodTestMeth1_0()
+   {
+      MethodInfo rtnVal = getLastMethod();
+      assert.areEqual(rtnVal,"");
+   }
+   public void replaceTestMeth1_0()
+   {
+   }
+   public void isTestTestMeth1_0()
+   {
+      boolean rtnVal = isTest(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void isTestTestMeth1_1()
+   {
+      boolean rtnVal = isTest(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void isTestTestMeth1_2()
+   {
+      boolean rtnVal = isTest(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void removeAllNonTestMethodsTestMeth1_0()
+   {
+   }
+   public void removeAllNonTestMethodsTestMeth1_1()
+   {
+   }
+   public void stripTestNameTestMeth1_0()
+   {
+      String rtnVal = stripTestName(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void stripTestNameTestMeth1_1()
+   {
+      String rtnVal = stripTestName(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void getMethodNameIndexTestMeth1_0()
+   {
+      int rtnVal = getMethodNameIndex(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void getMethodNameIndexTestMeth1_1()
+   {
+      int rtnVal = getMethodNameIndex(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void getMethodNameIndexTestMeth1_2()
+   {
+      int rtnVal = getMethodNameIndex(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void getMethodForTestTestMeth1_0()
+   {
+      MethodInfo rtnVal = getMethodForTest(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void getMethodForTestTestMeth1_1()
+   {
+      MethodInfo rtnVal = getMethodForTest(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void getMethodForTestTestMeth1_2()
+   {
+      MethodInfo rtnVal = getMethodForTest(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void getMethodForTestTestMeth1_3()
+   {
+      MethodInfo rtnVal = getMethodForTest(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void getMethodForTestTestMeth1_4()
+   {
+      MethodInfo rtnVal = getMethodForTest(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void getMethodForTestTestMeth1_5()
+   {
+      MethodInfo rtnVal = getMethodForTest(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void getMethodWithNameTestMeth1_0()
+   {
+      MethodInfo rtnVal = getMethodWithName(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void getMethodWithNameTestMeth1_1()
+   {
+      MethodInfo rtnVal = getMethodWithName(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void countMethodsWithNameTestMeth1_0()
+   {
+      int rtnVal = countMethodsWithName(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void countMethodsWithNameTestMeth1_1()
+   {
+      int rtnVal = countMethodsWithName(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void countMethodsWithNameTestMeth1_2()
+   {
+      int rtnVal = countMethodsWithName(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void countMethodsWithNameTestMeth1_3()
+   {
+      int rtnVal = countMethodsWithName(0);
+      assert.areEqual(rtnVal,"");
+   }
+}
+class VarInfoTests
+{
+   String name;
+   String type;
+   int access;
+   int nDimensions;
+   int startLine;
+   int endLine;
+   int classIndex;
+
+   VarInfoTests(String in, int lineNo, int ci)
+   {
+      startLine = lineNo;
+      endLine = lineNo;
+      classIndex = ci;
+      
+      access = WhiteboxUtils.getAccessLevel(in);
+      in = WhiteboxUtils.removeAccessModifiers(in);
+      
+      String temp = in;
+      try
+      {
+         temp = temp.substring(0, temp.indexOf(';'));
+         temp = temp.substring(0, temp.indexOf('='));
+      }
+      catch(StringIndexOutOfBoundsException ex)
+      {}
+      temp.trim();
+      
+      String[] vardecl = temp.split(" ");
+      type = vardecl[0];
+      name = vardecl[1];
+      
+      nDimensions = countDimensions();
+      
+   }
+
+   VarInfoTests(String type, String name, int lineNo)
+   {
+      this.type = type;
+      this.name = name;
+      nDimensions = countDimensions();
+      startLine = endLine = lineNo;
+   }
+
+   private int countDimensions()
+   {
+      String glob = type + name;
+      int bracketLevel = 0;
+      int nDims = 0;
+      for(int i = 0; i < glob.length(); i++)
+      {
+         if(glob.charAt(i) == '[')
+            bracketLevel++;
+         else if(glob.charAt(i) == ']')
+         {
+            bracketLevel--;
+            if(bracketLevel == 0)
+               nDims++;
+         }
+      }
+      return nDims;
+   }
+
+   public void VarInfoTestCtor1_0()
+   {
+      VarInfoTests testClass = new VarInfoTests(012);
+      assert.areEqual(testClass.startLine,"");
+      assert.areEqual(testClass.endLine,"");
+      assert.areEqual(testClass.classIndex,"");
+      assert.areEqual(testClass.access,"");
+      assert.areEqual(testClass.type,"");
+      assert.areEqual(testClass.name,"");
+      assert.areEqual(testClass.nDimensions,"");
+   }
+   public void VarInfoTestCtor2_0()
+   {
+      VarInfoTests testClass = new VarInfoTests(012);
+      assert.areEqual(testClass.type,"");
+      assert.areEqual(testClass.name,"");
+      assert.areEqual(testClass.nDimensions,"");
+      assert.areEqual(testClass.startLine,"");
+   }
+   public void countDimensionsTestMeth1_0()
+   {
+      int rtnVal = countDimensions();
+      assert.areEqual(rtnVal,"");
+   }
+   public void countDimensionsTestMeth1_1()
+   {
+      int rtnVal = countDimensions();
+      assert.areEqual(rtnVal,"");
+   }
+   public void countDimensionsTestMeth1_2()
+   {
+      int rtnVal = countDimensions();
+      assert.areEqual(rtnVal,"");
+   }
+   public void countDimensionsTestMeth1_3()
+   {
+      int rtnVal = countDimensions();
+      assert.areEqual(rtnVal,"");
+   }
+   public void countDimensionsTestMeth1_4()
+   {
+      int rtnVal = countDimensions();
+      assert.areEqual(rtnVal,"");
+   }
+}
+class VarListTests
+{
+
+   public VarInfo getVar(int index)
+   {
+      return (VarInfo) super.get(index);
+   }
+
+   public VarInfo getFirstVar()
+   {
+      return (VarInfo) super.getFirst();
+   }
+
+   public VarInfo getLastVar()
+   {
+      return (VarInfo) super.getLast();
+   }
+
+   public void getVarTestMeth1_0()
+   {
+      VarInfo rtnVal = getVar(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void getFirstVarTestMeth1_0()
+   {
+      VarInfo rtnVal = getFirstVar();
+      assert.areEqual(rtnVal,"");
+   }
+   public void getLastVarTestMeth1_0()
+   {
+      VarInfo rtnVal = getLastVar();
+      assert.areEqual(rtnVal,"");
+   }
+}
+class AssertionInfoTests
+{
+   int line;
+   VarInfo dataType;
+   String dataName;
+   String fromClass;
+   boolean isExplicit;
+   boolean isReturn;
+
+   AssertionInfoTests(String line, int lineNo, ClassList progTree)
+   {
+      this.line = lineNo;
+      line = line.trim();
+      fromClass = "";
+      if(line.startsWith("return"))
+      {
+         dataName = "rtnVal";
+         dataType = progTree.findMethodWithLine(lineNo).returnType;
+         isReturn = true;
+      }
+      else
+      {
+         String[] equ = line.split("=");
+         dataName = equ[0].trim();
+         
+         String[] dots = dataName.split("\\.");
+         String lastSection;
+         if(dots.length == 0)
+            lastSection = equ[0];
+         else
+            lastSection = dots[dots.length - 1];
+         lastSection = lastSection.trim();
+         String firstSection;
+         if(dots.length == 0)
+            firstSection = equ[0];
+         else
+            firstSection = dots[0];
+         firstSection = firstSection.trim();
+         //while(j < )
+         if(firstSection.equals(lastSection) || firstSection.equals("this"))
+         {
+            fromClass = progTree.findClassWithLine(lineNo).className;
+         }
+         
+         for(int i = 0; i < progTree.size(); i++)
+         {
+            ClassInfo ci = progTree.getClass(i);
+            VarList vl = ci.vars;
+            for(int j = 0; j < vl.size(); j++)
+            {
+               if(vl.getVar(j).name.equals(firstSection) && !firstSection.equals(lastSection))
+               {
+                  fromClass = vl.getVar(j).type;
+               }
+               if(vl.getVar(j).name.equals(lastSection))
+               {
+                  dataType = vl.getVar(j);
+               }
+            }
+         }
+      }
+      //System.out.println("Found assertion on line " + lineNo + ":");
+      //System.out.println("  line:" + line);
+      //System.out.println("  assertion is on " + dataName + ", is of type " + dataType.type + ", and requires a |" + fromClass + "|");
+   }
+
+   AssertionInfoTests(int lineNo)  //testing purposes
+   {
+      line = lineNo;
+   }
+
+   public boolean equals(AssertionInfo ai)
+   {
+      if(ai.dataName == null)
+         return false;
+      if(dataName.equals(ai.dataName) && dataType.equals(ai.dataType) && fromClass.equals(ai.fromClass))
+         return true;
+      else
+         return false;
+   }
+
+   public void AssertionInfoTestCtor1_0()
+   {
+      AssertionInfoTests testClass = new AssertionInfoTests(012);
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.fromClass,"");
+      assert.areEqual(testClass.dataName,"");
+      assert.areEqual(testClass.dataType,"");
+      assert.areEqual(testClass.isReturn,"");
+   }
+   public void AssertionInfoTestCtor1_1()
+   {
+      AssertionInfoTests testClass = new AssertionInfoTests(012);
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.fromClass,"");
+      assert.areEqual(testClass.dataName,"");
+      assert.areEqual(testClass.dataType,"");
+   }
+   public void AssertionInfoTestCtor1_2()
+   {
+      AssertionInfoTests testClass = new AssertionInfoTests(012);
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.fromClass,"");
+      assert.areEqual(testClass.dataName,"");
+   }
+   public void AssertionInfoTestCtor1_3()
+   {
+      AssertionInfoTests testClass = new AssertionInfoTests(012);
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.fromClass,"");
+      assert.areEqual(testClass.dataName,"");
+      assert.areEqual(testClass.dataType,"");
+   }
+   public void AssertionInfoTestCtor1_4()
+   {
+      AssertionInfoTests testClass = new AssertionInfoTests(012);
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.fromClass,"");
+      assert.areEqual(testClass.dataName,"");
+   }
+   public void AssertionInfoTestCtor1_5()
+   {
+      AssertionInfoTests testClass = new AssertionInfoTests(012);
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.fromClass,"");
+      assert.areEqual(testClass.dataName,"");
+      assert.areEqual(testClass.dataType,"");
+   }
+   public void AssertionInfoTestCtor1_6()
+   {
+      AssertionInfoTests testClass = new AssertionInfoTests(012);
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.fromClass,"");
+      assert.areEqual(testClass.dataName,"");
+   }
+   public void AssertionInfoTestCtor1_7()
+   {
+      AssertionInfoTests testClass = new AssertionInfoTests(012);
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.fromClass,"");
+      assert.areEqual(testClass.dataName,"");
+      assert.areEqual(testClass.dataType,"");
+   }
+   public void AssertionInfoTestCtor1_8()
+   {
+      AssertionInfoTests testClass = new AssertionInfoTests(012);
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.fromClass,"");
+      assert.areEqual(testClass.dataName,"");
+   }
+   public void AssertionInfoTestCtor1_9()
+   {
+      AssertionInfoTests testClass = new AssertionInfoTests(012);
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.fromClass,"");
+      assert.areEqual(testClass.dataName,"");
+      assert.areEqual(testClass.dataType,"");
+   }
+   public void AssertionInfoTestCtor1_10()
+   {
+      AssertionInfoTests testClass = new AssertionInfoTests(012);
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.fromClass,"");
+      assert.areEqual(testClass.dataName,"");
+   }
+   public void AssertionInfoTestCtor1_11()
+   {
+      AssertionInfoTests testClass = new AssertionInfoTests(012);
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.fromClass,"");
+      assert.areEqual(testClass.dataName,"");
+      assert.areEqual(testClass.dataType,"");
+   }
+   public void AssertionInfoTestCtor1_12()
+   {
+      AssertionInfoTests testClass = new AssertionInfoTests(012);
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.fromClass,"");
+      assert.areEqual(testClass.dataName,"");
+   }
+   public void AssertionInfoTestCtor1_13()
+   {
+      AssertionInfoTests testClass = new AssertionInfoTests(012);
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.fromClass,"");
+      assert.areEqual(testClass.dataName,"");
+      assert.areEqual(testClass.dataType,"");
+   }
+   public void AssertionInfoTestCtor1_14()
+   {
+      AssertionInfoTests testClass = new AssertionInfoTests(012);
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.fromClass,"");
+      assert.areEqual(testClass.dataName,"");
+   }
+   public void AssertionInfoTestCtor1_15()
+   {
+      AssertionInfoTests testClass = new AssertionInfoTests(012);
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.fromClass,"");
+      assert.areEqual(testClass.dataName,"");
+      assert.areEqual(testClass.dataType,"");
+   }
+   public void AssertionInfoTestCtor1_16()
+   {
+      AssertionInfoTests testClass = new AssertionInfoTests(012);
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.fromClass,"");
+      assert.areEqual(testClass.dataName,"");
+   }
+   public void AssertionInfoTestCtor1_17()
+   {
+      AssertionInfoTests testClass = new AssertionInfoTests(012);
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.fromClass,"");
+      assert.areEqual(testClass.dataName,"");
+      assert.areEqual(testClass.dataType,"");
+   }
+   public void AssertionInfoTestCtor1_18()
+   {
+      AssertionInfoTests testClass = new AssertionInfoTests(012);
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.fromClass,"");
+      assert.areEqual(testClass.dataName,"");
+   }
+   public void AssertionInfoTestCtor1_19()
+   {
+      AssertionInfoTests testClass = new AssertionInfoTests(012);
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.fromClass,"");
+      assert.areEqual(testClass.dataName,"");
+      assert.areEqual(testClass.dataType,"");
+   }
+   public void AssertionInfoTestCtor1_20()
+   {
+      AssertionInfoTests testClass = new AssertionInfoTests(012);
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.fromClass,"");
+      assert.areEqual(testClass.dataName,"");
+   }
+   public void AssertionInfoTestCtor1_21()
+   {
+      AssertionInfoTests testClass = new AssertionInfoTests(012);
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.fromClass,"");
+      assert.areEqual(testClass.dataName,"");
+      assert.areEqual(testClass.dataType,"");
+   }
+   public void AssertionInfoTestCtor1_22()
+   {
+      AssertionInfoTests testClass = new AssertionInfoTests(012);
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.fromClass,"");
+      assert.areEqual(testClass.dataName,"");
+   }
+   public void AssertionInfoTestCtor1_23()
+   {
+      AssertionInfoTests testClass = new AssertionInfoTests(012);
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.fromClass,"");
+      assert.areEqual(testClass.dataName,"");
+      assert.areEqual(testClass.dataType,"");
+   }
+   public void AssertionInfoTestCtor1_24()
+   {
+      AssertionInfoTests testClass = new AssertionInfoTests(012);
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.fromClass,"");
+      assert.areEqual(testClass.dataName,"");
+   }
+   public void AssertionInfoTestCtor1_25()
+   {
+      AssertionInfoTests testClass = new AssertionInfoTests(012);
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.fromClass,"");
+      assert.areEqual(testClass.dataName,"");
+      assert.areEqual(testClass.dataType,"");
+   }
+   public void AssertionInfoTestCtor1_26()
+   {
+      AssertionInfoTests testClass = new AssertionInfoTests(012);
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.fromClass,"");
+      assert.areEqual(testClass.dataName,"");
+   }
+   public void AssertionInfoTestCtor1_27()
+   {
+      AssertionInfoTests testClass = new AssertionInfoTests(012);
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.fromClass,"");
+      assert.areEqual(testClass.dataName,"");
+      assert.areEqual(testClass.dataType,"");
+   }
+   public void AssertionInfoTestCtor1_28()
+   {
+      AssertionInfoTests testClass = new AssertionInfoTests(012);
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.fromClass,"");
+      assert.areEqual(testClass.dataName,"");
+   }
+   public void AssertionInfoTestCtor1_29()
+   {
+      AssertionInfoTests testClass = new AssertionInfoTests(012);
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.fromClass,"");
+      assert.areEqual(testClass.dataName,"");
+      assert.areEqual(testClass.dataType,"");
+   }
+   public void AssertionInfoTestCtor1_30()
+   {
+      AssertionInfoTests testClass = new AssertionInfoTests(012);
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.fromClass,"");
+      assert.areEqual(testClass.dataName,"");
+   }
+   public void AssertionInfoTestCtor1_31()
+   {
+      AssertionInfoTests testClass = new AssertionInfoTests(012);
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.fromClass,"");
+      assert.areEqual(testClass.dataName,"");
+      assert.areEqual(testClass.dataType,"");
+   }
+   public void AssertionInfoTestCtor1_32()
+   {
+      AssertionInfoTests testClass = new AssertionInfoTests(012);
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.fromClass,"");
+      assert.areEqual(testClass.dataName,"");
+   }
+   public void AssertionInfoTestCtor2_0()
+   {
+      AssertionInfoTests testClass = new AssertionInfoTests(0);
+      assert.areEqual(testClass.line,"");
+   }
+   public void equalsTestMeth1_0()
+   {
+      boolean rtnVal = equals(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void equalsTestMeth1_1()
+   {
+      boolean rtnVal = equals(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void equalsTestMeth1_2()
+   {
+      boolean rtnVal = equals(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void equalsTestMeth1_3()
+   {
+      boolean rtnVal = equals(0);
+      assert.areEqual(rtnVal,"");
+   }
+}
+class AssertionListTests
+{
+
+   public AssertionInfo getAssertion(int index)
+   {
+      return (AssertionInfo) super.get(index);
+   }
+
+   public AssertionInfo getFirstAssertion()
+   {
+      return (AssertionInfo) super.getFirst();
+   }
+
+   public AssertionInfo getLastAssertion()
+   {
+      return (AssertionInfo) super.getLast();
+   }   
+
+   public boolean hasReturnAssertion()
+   {
+      for(int i = 0; i < size(); i++)
+      {
+         AssertionInfo ai = getAssertion(i);
+         if(ai.isReturn)
+            return true;
+      }
+      return false;
+   }
+
+   public void addAssertion(AssertionInfo newAssertion)
+   {
+      for(int i = 0; i < this.size(); i++)
+      {
+         AssertionInfo ai = getAssertion(i);
+         if(ai.equals(newAssertion))
+            return;
+      }
+      super.add(newAssertion);
+   }
+
+   public String getListString()
+   {
+      String rtnVal = "";
+      for(int i = 0; i < size(); i++)
+      {
+         AssertionInfo ai = getAssertion(i);
+         rtnVal += "line " + ai.line + ": " + ai.dataName + "\n";  
+      }
+      return rtnVal;
+   }
+
+   public void getAssertionTestMeth1_0()
+   {
+      AssertionInfo rtnVal = getAssertion(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void getFirstAssertionTestMeth1_0()
+   {
+      AssertionInfo rtnVal = getFirstAssertion();
+      assert.areEqual(rtnVal,"");
+   }
+   public void getLastAssertionTestMeth1_0()
+   {
+      AssertionInfo rtnVal = getLastAssertion();
+      assert.areEqual(rtnVal,"");
+   }
+   public void hasReturnAssertionTestMeth1_0()
+   {
+      boolean rtnVal = hasReturnAssertion();
+      assert.areEqual(rtnVal,"");
+   }
+   public void hasReturnAssertionTestMeth1_1()
+   {
+      boolean rtnVal = hasReturnAssertion();
+      assert.areEqual(rtnVal,"");
+   }
+   public void addAssertionTestMeth1_0()
+   {
+      void rtnVal = addAssertion(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void addAssertionTestMeth1_1()
+   {
+   }
+   public void getListStringTestMeth1_0()
+   {
+      String rtnVal = getListString();
+      assert.areEqual(rtnVal,"");
+   }
+}
+class TestInfoTests
+{
+   int line;
+   String name;
+   String commentName;
+   boolean isExplicit;
+   int testState;
+   int compileState;
+   String[] testLines;
+   String testCode;
+   AssertionList asserts;
+   MethodInfo assocMethod;
+
+   TestInfoTests(int lineNo)
+   {
+      line = lineNo;
+      asserts = new AssertionList();
+   }
+
+   TestInfoTests(String in, String name)
+   {
+	   testLines = in.split("\n");
+	   asserts = new AssertionList();
+   }
+
+   TestInfoTests(MethodInfo codeMi, String cn)
+   {
+	   name = codeMi.name;
+	   testCode = codeMi.getLines();
+	   commentName = cn;
+   }
+
+   String[] getTestLines()
+   {
+	   return testLines;
+   }
+
+   public String getIconState()
+   {
+      int iconState = compileState * 4 + testState;
+      return("ts" + iconState + ".gif");
+   }
+
+   public String getTestCode()
+   {
+	   return testCode;
+   }
+
+   public void setTestCode(String in)
+   {
+	   testCode = in;
+   }
+
+   public void setCommentName(String in)
+   {
+	   commentName = in;
+   }
+
+   public String getCommentName()
+   {
+	   return commentName;
+   }
+
+   public MethodInfo getAssocMethod()
+   {
+	   return assocMethod;
+   }
+
+   public void setAssocMethod(MethodInfo mi)
+   {
+	   assocMethod = mi;
+   }
+
+   public void TestInfoTestCtor1_0()
+   {
+      TestInfoTests testClass = new TestInfoTests(0);
+      assert.areEqual(testClass.line,"");
+      assert.areEqual(testClass.asserts,"");
+   }
+   public void TestInfoTestCtor2_0()
+   {
+      TestInfoTests testClass = new TestInfoTests(01);
+      assert.areEqual(testClass.testLines,"");
+      assert.areEqual(testClass.asserts,"");
+   }
+   public void TestInfoTestCtor3_0()
+   {
+      TestInfoTests testClass = new TestInfoTests(01);
+      assert.areEqual(testClass.name,"");
+      assert.areEqual(testClass.testCode,"");
+      assert.areEqual(testClass.commentName,"");
+   }
+   public void getTestLinesTestMeth1_0()
+   {
+      String[] rtnVal = getTestLines();
+      assert.areEqual(rtnVal,"");
+   }
+   public void getIconStateTestMeth1_0()
+   {
+      String rtnVal = getIconState();
+      assert.areEqual(rtnVal,"");
+   }
+   public void getTestCodeTestMeth1_0()
+   {
+      String rtnVal = getTestCode();
+      assert.areEqual(rtnVal,"");
+   }
+   public void setTestCodeTestMeth1_0()
+   {
+      TestInfo testClass0 = new TestInfoTest();
+      setTestCode(0);
+      assert.areEqual(testClass0.testCode,"");
+   }
+   public void setCommentNameTestMeth1_0()
+   {
+      TestInfo testClass0 = new TestInfoTest();
+      setCommentName(0);
+      assert.areEqual(testClass0.commentName,"");
+   }
+   public void getCommentNameTestMeth1_0()
+   {
+      String rtnVal = getCommentName();
+      assert.areEqual(rtnVal,"");
+   }
+   public void getAssocMethodTestMeth1_0()
+   {
+      MethodInfo rtnVal = getAssocMethod();
+      assert.areEqual(rtnVal,"");
+   }
+   public void setAssocMethodTestMeth1_0()
+   {
+      TestInfo testClass0 = new TestInfoTest();
+      setAssocMethod(0);
+      assert.areEqual(testClass0.assocMethod,"");
+   }
+}
+class TestListTests
+{
+
+   public TestInfo getTest(int index)
+   {
+      return (TestInfo) super.get(index);
+   }
+
+   public TestInfo getFirstTest()
+   {
+      return (TestInfo) super.getFirst();
+   }
+
+   public TestInfo getLastTest()
+   {
+      return (TestInfo) super.getLast();
+   }   
+
+   public void getTestTestMeth1_0()
+   {
+      TestInfo rtnVal = getTest(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void getFirstTestTestMeth1_0()
+   {
+      TestInfo rtnVal = getFirstTest();
+      assert.areEqual(rtnVal,"");
+   }
+   public void getLastTestTestMeth1_0()
+   {
+      TestInfo rtnVal = getLastTest();
+      assert.areEqual(rtnVal,"");
+   }
+}
+

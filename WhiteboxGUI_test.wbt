@@ -1,0 +1,2164 @@
+class TestCellRendererTests
+{
+
+   public Component getTreeCellRendererComponent(
+         JTree tree,
+         Object value,
+         boolean sel,
+         boolean expanded,
+         boolean leaf,
+         int row,
+         boolean hasFocus)
+   {
+      super.getTreeCellRendererComponent(
+            tree, value, sel,
+            expanded, leaf, row,
+            hasFocus);
+      DefaultMutableTreeNode nde = (DefaultMutableTreeNode) value;
+      Object obj = nde.getUserObject();
+      if(obj.getClass().getName().equals("TestInfo"))
+      {
+         Icon icn = getTestIcon((TestInfo) obj);
+         setLeafIcon(icn);
+      }
+      return this;
+   }
+
+   private Icon getTestIcon(MethodInfo mi)
+   {
+      String gif = mi.getIconState();
+      Image img = Toolkit.getDefaultToolkit().getImage(gif);
+      return(new ImageIcon(img));
+   }
+
+   private Icon getTestIcon(TestInfo ti)
+   {
+	   String gif = ti.getIconState();
+	   Image img = Toolkit.getDefaultToolkit().getImage(gif);
+	   return(new ImageIcon(img)); 
+   }
+
+   public void getTreeCellRendererComponentTestMeth1_0()
+   {
+      Component rtnVal = getTreeCellRendererComponent(0123456);
+      assert.areEqual(rtnVal,"");
+   }
+   public void getTreeCellRendererComponentTestMeth1_1()
+   {
+      Component rtnVal = getTreeCellRendererComponent(0123456);
+      assert.areEqual(rtnVal,"");
+   }
+   public void getTestIconTestMeth1_0()
+   {
+      Icon rtnVal = getTestIcon(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void getTestIconTestMeth2_0()
+   {
+      Icon rtnVal = getTestIcon(0);
+      assert.areEqual(rtnVal,"");
+   }
+}
+class StringRefTests
+{
+   String s;
+
+   StringRefTests(String in)
+   {
+      s = in;
+   }
+
+   public void set(String in)
+   {
+      s = in;
+   }
+
+   public String get()
+   {
+      if(s != null)
+         return s;
+      else
+         return null;
+   }
+
+   public boolean isAbsolutePath()
+   {
+      URI uri = URI.create(s);
+      if(uri.isAbsolute()) 
+      {
+         return true;
+      }
+      
+      //    
+      // Check the scheme of the URI created above because this is more
+      // robust than checking substrings.
+      //
+      if(uri.getScheme() == null || uri.getScheme().equals("file")) 
+      {
+         
+         //
+         // Use the path portion of the URI. This will allow the code
+         // to handle file URIs.
+         //
+         File file = new File(uri.getPath());
+         if(file.isAbsolute()) 
+         {
+            return true;
+         }
+      }
+      
+      //
+      // If none of the above worked, then this isn't an absolute path.
+      //
+      return false;
+   }
+
+   public void setAsAbsolute()
+   {
+      File f = new File(s);
+      s = f.getAbsolutePath();
+   }
+
+   public void StringRefTestCtor1_0()
+   {
+      StringRefTests testClass = new StringRefTests(0);
+      assert.areEqual(testClass.s,"");
+   }
+   public void setTestMeth1_0()
+   {
+      StringRef testClass0 = new StringRefTest();
+      set(0);
+      assert.areEqual(testClass0.s,"");
+   }
+   public void getTestMeth1_0()
+   {
+      String rtnVal = get();
+      assert.areEqual(rtnVal,"");
+   }
+   public void getTestMeth1_1()
+   {
+      String rtnVal = get();
+      assert.areEqual(rtnVal,"");
+   }
+   public void isAbsolutePathTestMeth1_0()
+   {
+      boolean rtnVal = isAbsolutePath();
+      assert.areEqual(rtnVal,"");
+   }
+   public void isAbsolutePathTestMeth1_1()
+   {
+      boolean rtnVal = isAbsolutePath();
+      assert.areEqual(rtnVal,"");
+   }
+   public void setAsAbsoluteTestMeth1_0()
+   {
+      StringRef testClass0 = new StringRefTest();
+      setAsAbsolute();
+      assert.areEqual(testClass0.s,"");
+   }
+}
+class WhiteboxUITests
+{
+   JTree testTree;
+   JScrollPane testView;
+   ImageIcon testIco;
+   DefaultMutableTreeNode testTop;
+   JMenuBar menuBar;
+   JMenu fileMenu;
+   JMenuItem loadTests;
+   JMenuItem extractTests;
+   JMenuItem saveTests;
+   JMenuItem saveTestsAs;
+   JMenuItem saveJUnit;
+   JMenuItem reExtract;
+   JMenuItem close;
+   JMenuItem exit;
+   JMenu testMenu;
+   JMenuItem add;
+   JMenuItem compile;
+   JMenuItem run;
+   JMenu optionMenu;
+   JTabbedPane testOutput;
+   JButton runTests;
+   JPanel testConfig;
+   JPanel innerConfig;
+   JPanel innerTest;
+   JPanel configTop;
+   JButton methButton;
+   JSplitPane innerPane;
+   JPanel errors;
+   JScrollPane errorScroll;
+   PrintStream sysErrRedirect;
+   JPanel sysOut;
+   JScrollPane sysOutScroll;
+   PrintStream sysOutRedirect;
+   String classTestAppend;
+   String methodTestAppend;
+   ClassList testClassList;
+   ClassList progClassList;
+   StringRef progPath;
+   StringRef progPattern;
+   StringRef testOutputFile;
+   StringRef testOutputFilePath;
+   JLabel progPathLbl;
+   JLabel progPtnLbl;
+   JLabel toFileLbl;
+   JLabel toPathLbl;
+   JPanel pathLbls;
+   FileSelectorBox fsb;
+   int fsbActNum;
+
+   WhiteboxUITests()
+   {
+      loadSettings();
+      progPath = new StringRef("");
+      progPattern = new StringRef("");
+      testOutputFile = new StringRef("");
+      testOutputFilePath = new StringRef("");
+      testTop = new DefaultMutableTreeNode("All tests");
+      testTree = new JTree(testTop);
+      testTree.addTreeSelectionListener(this);
+      testTree.setCellRenderer(new TestCellRenderer());
+      updateTests(".", ".*\\.java", false);
+      //testClassList = getTests(".", ".*_test\\.java");
+      fillTree(testClassList);
+      
+      testView = new JScrollPane(testTree);
+      testOutput = new JTabbedPane();
+      
+      methButton = new JButton();
+      methButton.addActionListener(this);
+
+      /*sysErrRedirect = new PrintStream(new ByteArrayOutputStream());
+      sysOutRedirect = new PrintStream(new ByteArrayOutputStream());
+      System.setErr(sysErrRedirect);
+      System.setOut(sysOutRedirect);*/
+      
+      
+      fillAllOutput();
+      expandTree(testTree);
+      
+      setupPathLabels();
+      
+      getContentPane().add(pathLbls, BorderLayout.NORTH);
+      getContentPane().add(testView, BorderLayout.WEST);
+      getContentPane().add(testOutput, BorderLayout.CENTER);
+      
+      setupMenus();
+      
+      setSize(Toolkit.getDefaultToolkit().getScreenSize());
+      setVisible(true);
+   }
+
+   private void setupPathLabels()
+   {
+      JPanel pTop = new JPanel(new BorderLayout());
+      JPanel pBot = new JPanel(new BorderLayout());
+      pathLbls = new JPanel(new GridLayout(2,1));
+      JLabel l1 = new JLabel("Program Path:");
+      JLabel l2 = new JLabel("Test Output Path:");
+      
+      progPtnLbl = new JLabel("");
+      toFileLbl = new JLabel("");
+      progPathLbl = new JLabel();
+      toPathLbl = new JLabel();
+      
+      progPathLbl.setText(progPath.get());
+      progPtnLbl.setText(progPattern.get());
+      toFileLbl.setText(testOutputFile.get());
+      toPathLbl.setText(testOutputFilePath.get());
+      
+      if(testOutputFilePath.get().equals(""))
+         toPathLbl.setText("<unset>");  
+      
+      if(progPath.get().equals(""))
+         progPathLbl.setText("<unset>");
+      
+      pTop.add(l1, BorderLayout.WEST);
+      pTop.add(progPathLbl, BorderLayout.CENTER);
+      pTop.add(progPtnLbl, BorderLayout.EAST);
+      pBot.add(l2, BorderLayout.WEST);
+      pBot.add(toPathLbl, BorderLayout.CENTER);
+      pBot.add(toFileLbl, BorderLayout.EAST);
+      pathLbls.add(pTop);
+      pathLbls.add(pBot);
+   }
+
+   private void expandTree(JTree tree)
+   {
+      int i = 0;
+      while( i < tree.getRowCount() ) 
+      {
+         tree.expandRow(i);
+         i++;
+      }
+
+   }
+
+   public void loadSettings()
+   {
+      classTestAppend = "Test";
+      methodTestAppend = "Test";
+   }
+
+   public void loadProgram(String path, String pattern)
+   {
+      String[] allFiles = getFileList(path, pattern);
+      String[] allClassfiles = new String[allFiles.length];
+      progClassList = new ClassList();
+      WhiteboxProgram p = new WhiteboxProgram();
+      int classNo = 0;
+      ClassList temp;
+      for(int i = 0; i < allFiles.length; i++)
+      {
+         p.generateTests(allFiles[i], classNo, true);
+         temp = p.getClassList();
+         classNo += temp.size();
+         progClassList.addAll(p.getClassList());
+      }
+   }
+
+   public void updateTests(String path, String fPattern, boolean removeOld)
+   {
+      
+      progPath.set(path);
+      progPattern.set(fPattern);
+      progPath.setAsAbsolute();
+      String[] allFiles = getFileList(path, fPattern);
+      String[] allClassfiles = new String[allFiles.length];
+      progClassList = new ClassList();
+      testClassList = new ClassList();
+      int currClass = 0;
+      //for each file that matches the pattern
+      for(int i = 0; i < allFiles.length; i++)
+      {
+         String[] temp = allFiles[i].split("\\.");
+         allClassfiles[i] = temp[0];
+         String outFile = temp[0] + "_test.wbt";
+         
+         //make the tests
+         System.out.println("Getting new tests...");
+         WhiteboxProgram p = new WhiteboxProgram();
+         //generate tests from the java (new tests)
+         p.generateTests(allFiles[i], currClass, true);
+         ClassList newTests = p.testProgram;
+         
+         //compare syntax trees (with old tests, from .wbt, .wbm)
+         System.out.println("Comparing with saved tests....");
+         File f = new File(outFile);
+         ClassList old;
+         if(f.exists())
+         {
+        	//generate tests from the wbt + wbm
+        	p.generateTests(outFile, currClass, false); 
+            old = p.getTestSynTree(currClass, allClassfiles[i] + "_test.wbm");
+         }
+         else
+            old = new ClassList();
+         //f = new File(temp[0] + "_test.wbo");
+         ClassList currentTests = old;
+         
+         for(int j = 0; j < newTests.size(); j++)
+         {
+            ClassInfo c = newTests.getClass(j);
+            ClassInfo c2 = old.getClass(j);
+            if(c2 == null)
+            {
+               currentTests.add(c);
+            }
+            else
+            {
+               for(int k = 0; k < c.methods.size(); k++)
+               {
+                  MethodInfo mi = c.methods.getMethod(k);
+                  MethodInfo mi2 = c2.methods.getMethod(k);
+                  if(mi2 == null)
+                  {
+                     currentTests.getClass(j).methods.add(mi);
+                  }
+                  else
+                  {
+                     if(!mi.isSame(mi2))
+                     {
+                        currentTests.getClass(j).methods.replace(k, mi);
+                     }
+                  }
+                  /*for(int l = 0; l < mi.tests.size(); l++)
+                  {
+                	  TestInfo ti = mi.tests.getTest(l);
+                  }*/
+               }
+            }
+         }
+         if(removeOld)
+         {
+            while(currentTests.size() > newTests.size())
+            {
+               currentTests.removeLast();
+            }
+         }
+         
+         p.dumpTests(newTests);
+         
+         
+         progClassList.addAll(p.getClassList());
+         testClassList.addAll(currentTests);
+         currClass += newTests.size();
+      }
+      testTop.removeAllChildren();
+      fillTree(testClassList);   
+   }
+
+   private ClassList getTests(String path, String fpattern)
+   {
+      String[] allTests = getFileList(path, fpattern);
+      ClassList rtnVal = new ClassList();
+      WhiteboxProgram prog = new WhiteboxProgram();
+      for(int i = 0; i < allTests.length; i++)
+      {
+         ClassList cl = prog.getSyntaxTree(allTests[i], 0);
+         for(int j = 0; j < cl.size(); j++)
+         {
+            ClassInfo ci = cl.getClass(j);
+            //ci.className = ci.className.substring(0, ci.className.length() - l1);
+            for(int k = 0; k < ci.methods.size(); k++)
+            {
+               MethodInfo mi = ci.methods.getMethod(k);
+               //mi.name = mi.name.substring(0, mi.name.length() - l2);
+            }
+         }
+         rtnVal.addAll(cl);
+      }
+      return rtnVal;
+   }
+
+   private String[] getFileList(String path, String fpattern)
+   {
+      File dir = new File(path);
+      
+      String[] children = dir.list();
+      String[] temp = new String[children.length];
+      int j = 0;
+      if (children != null) 
+      {
+          for (int i = 0; i < children.length; i++) 
+          {
+              // Get filename of file or directory
+              if(children[i].matches(fpattern))
+              {
+                 temp[j] = children[i];
+                 j++;
+              }
+          }
+      }
+      String[] rtnVal = new String[j];
+      for(int i = 0; i < j; i++)
+         rtnVal[i] = temp[i];
+      
+      return(rtnVal);
+   }
+
+   private void fillAllOutput()
+   {
+      testOutput.removeAll();
+      testOutput.addTab("Test", testConfig);
+      testOutput.addTab("Errors/Failures", errors);
+      testOutput.addTab("System Output", sysOut);
+   }
+
+   private void fillTree(ClassList cl)
+   {
+      for(int i = 0; i < cl.size(); i++)
+      {
+         ClassInfo c = cl.getClass(i);
+         DefaultMutableTreeNode cat = new DefaultMutableTreeNode(c.className);
+         
+         for(int j = 0; j < c.methods.size(); j++)
+         {
+            MethodInfo m = c.methods.getMethod(j);
+            DefaultMutableTreeNode meth = new DefaultMutableTreeNode(m.name);
+            meth.setUserObject(m);
+            for(int k = 0; k < m.tests.size(); k++)
+            {
+            	TestInfo t = m.tests.getTest(k);
+            	DefaultMutableTreeNode test = new DefaultMutableTreeNode(t.name);
+            	test.setUserObject(t);
+            	meth.add(test);
+            }
+            if(m.tests.size() > 0)
+            	cat.add(meth);
+         }
+         testTop.add(cat);
+      }
+   }
+
+   private void fillTestConfig(MethodInfo info, TestInfo testInfo)
+   { 
+      //the top info line
+	  configTop = new JPanel(new FlowLayout());
+      JLabel topLabel;
+      if(testInfo == null)
+    	  topLabel = new JLabel("Test config for " + info.name);
+      else
+    	  topLabel = new JLabel("Test config for " + testInfo.name);
+      /*MethodInfo m = progClassList.findMethodForTest(info);
+      String n = m.name;*/
+      
+      //methButton.setText((progClassList.findMethodForTest(info)).name);
+      
+      configTop.add(topLabel);
+      //configTop.add(methButton);
+      //configTop.add(saveButton);
+      
+      JTextArea top;
+      JScrollPane tPne;
+      JScrollPane bPne;
+      //JPanel noWrap = new JPanel(new BorderLayout());
+      innerConfig = new JPanel(new GridLayout(2,1));
+      
+      //the top half
+      if(testInfo != null)
+    	  top = new JTextArea(testInfo.getTestCode());
+      else
+    	  top = new JTextArea("");
+      top.setFont(new Font("monospaced", Font.PLAIN, 12));
+      tPne = new JScrollPane(top);
+      innerConfig.add(tPne);
+      
+      //the bottom half
+      
+      if(testInfo != null)
+      {
+    	  JTabbedPane tabBottom = new JTabbedPane();
+    	  FunctionViewPanel bottom1 = new FunctionViewPanel(testInfo);
+    	  JScrollPane fvscroll = new JScrollPane(bottom1);
+    	  JTextPane bottom = new JTextPane();
+    	  bottom.setFont(new Font("monospaced", Font.PLAIN, 12));
+    	  bottom.setText(info.getLines());
+    	  bottom.setEditable(false);
+    	  bPne = new JScrollPane(bottom);
+    	  tabBottom.addTab("Method", bPne);
+    	  tabBottom.addTab("Path", fvscroll);
+    	  tabBottom.setSelectedIndex(1);
+    	  innerConfig.add(tabBottom);
+      }
+      else
+      {
+    	  JTextPane bottom = new JTextPane();
+    	  bottom.setText(info.getLines());
+    	  bottom.setFont(new Font("monospaced", Font.PLAIN, 12));
+    	  bottom.setEditable(false);
+    	  
+    	  bPne = new JScrollPane(bottom);
+    	  innerConfig.add(bPne);
+      }
+      //bottom2 = new FunctionViewPanel()
+      
+      
+      
+      //innerTest = new JPanel(new BorderLayout());
+      
+      
+      
+      
+      testConfig = new JPanel(new BorderLayout());
+      testConfig.add(configTop, BorderLayout.NORTH);
+      testConfig.add(innerConfig, BorderLayout.CENTER);
+      //testConfig.add(innerTest, BorderLayout.SOUTH);
+      
+   }
+
+   private String[] openWbcfile()
+   {
+      return null;
+   }
+
+   private void loadTestConfig(String wbt)  //wbt -> program
+   {
+      testOutputFile.set(wbt);
+      String pattern = WhiteboxUtils.getWbtPattern(wbt);
+      int lastSlash = pattern.lastIndexOf('\\');
+      progPath.set(pattern.substring(0, lastSlash));
+      progPattern.set(pattern.substring(lastSlash, pattern.length()));
+      WhiteboxProgram p = new WhiteboxProgram();
+      testClassList = p.getSyntaxTree(wbt, 0);
+      for(int i = 0; i < testClassList.size(); i++)
+      {
+         testClassList.getClass(i).methods.removeAllNonTestMethods();
+      }
+      loadProgram(progPath.get(), progPattern.get());
+   }
+
+   public void saveTestConfig(String outFile)
+   {
+      try
+      {
+         FileWriter fw = new FileWriter(outFile);
+         BufferedWriter bw = new BufferedWriter(fw);
+         //write the pattern
+         bw.write("//tests-from:");
+         bw.write(progPath + "\\" + progPattern + "\n");
+         bw.write(saveTests());
+         bw.close();
+      }
+      catch(IOException ex)
+      {
+         ex.printStackTrace();
+      }
+   }
+
+   private String saveTests()  //program -> wbt
+   {
+      String out = "";
+      //for each class
+      for(int i = 0; i < progClassList.size(); i++)
+      {
+         //dump the class
+         ClassInfo ci = progClassList.getClass(i);
+         out += ci.className + "Test";  //+ extends plus implements
+         out += "\n{\n";
+         
+         //dump each var as public
+         for(int j = 0; j < ci.vars.size(); j++)
+         {
+            VarInfo vi = ci.vars.getVar(j);
+            out += "   public " + vi.type + " " + vi.name + "\n";
+         }
+         
+         //dump each method as public
+         for(int j = 0; j < ci.methods.size(); j++)
+         {
+            MethodInfo mi = ci.methods.getMethod(j);
+            int priv = mi.lines[0].indexOf("private");
+            if(priv > 0)
+            {
+               mi.lines[0] = mi.lines[0].replaceFirst("private", "public"); 
+            }
+            for(int k = 0; k < mi.lines.length; k++)
+            {
+               out += "   " + mi.lines[k];
+            }
+         }
+         //dump each test method
+         ClassInfo c2 = testClassList.getClass(i);
+         for(int j = 0; j < c2.methods.size(); j++)
+         {
+            MethodInfo mi = c2.methods.getMethod(j);
+            for(int k = 0; k < mi.lines.length; k++)
+            {
+               out += "   " + mi.lines[k];
+            }
+         }
+         out += "}\n\n";
+      }
+      return out;
+   }
+
+   private void fillErrors()
+   {
+      JTextArea area = new JTextArea(sysErrRedirect.toString());
+      errorScroll = new JScrollPane(area);
+      errors = new JPanel(new BorderLayout());
+      errors.add(sysOutScroll, BorderLayout.CENTER);
+   }
+
+   private void fillSysout()
+   {
+      JTextArea area = new JTextArea(sysOutRedirect.toString());
+      sysOutScroll = new JScrollPane(area);
+      sysOut = new JPanel(new BorderLayout());
+      sysOut.add(sysOutScroll, BorderLayout.CENTER);
+   }
+
+   public void valueChanged(TreeSelectionEvent ev) 
+   {
+      DefaultMutableTreeNode node = (DefaultMutableTreeNode)
+         testTree.getLastSelectedPathComponent();
+
+      if (node == null) 
+         return;
+      String classname = node.getUserObject().getClass().getName();
+      if(classname.equals("java.lang.String"))
+         return;
+      else if(classname.equals("MethodInfo"))
+      {
+      
+    	  MethodInfo mi = (MethodInfo) node.getUserObject();
+    	  fillTestConfig(mi, null);
+      }
+      else
+      {
+    	  TestInfo ti = (TestInfo) node.getUserObject();
+    	  fillTestConfig(ti.getAssocMethod(), ti);
+      }
+      fillAllOutput();
+   }
+
+   private TreePath findObjectInTree(Object o)
+   {
+      java.util.Enumeration nodes = ((DefaultMutableTreeNode) testTree.getModel().getRoot()).preorderEnumeration();
+      while (nodes.hasMoreElements()) 
+      {
+         DefaultMutableTreeNode node = (DefaultMutableTreeNode) nodes.nextElement();
+         if (node.getUserObject() == o) 
+         {
+            return new TreePath(node.getPath());
+         }
+      }
+      return null;
+   }
+
+   public void actionPerformed(ActionEvent e)
+   {
+      if(e.getSource() == methButton)
+      {
+         DefaultMutableTreeNode node = (DefaultMutableTreeNode)
+         testTree.getLastSelectedPathComponent();
+
+         if (node == null) 
+            return;
+         if(node.getUserObject().getClass().getName().equals("java.lang.String"))
+            return; 
+         else if(node.getUserObject().getClass().getName().equals("MethodInfo"))
+         {
+        	 MethodInfo mi = (MethodInfo) node.getUserObject();
+        	 FunctionViewUI pan = new FunctionViewUI(mi);
+         }
+         else
+         {
+        	TestInfo ti = (TestInfo) node.getUserObject();
+        	FunctionViewUI pan = new FunctionViewUI(ti.getAssocMethod()); 
+         }
+         
+         
+      }
+      if(e.getSource() == fsb.okBtn)
+      {
+         fsb.okBtn.removeActionListener(this);
+         progPath.set(fsb.pathTxt.getText());
+         progPattern.set(fsb.patternTxt.getText());
+         updateTests(progPath.get(), progPattern.get(), false);
+         fsb.setVisible(false);
+      }
+      if(e.getSource() == loadTests)
+      {
+         selectFileToOpen();
+         loadTestConfig(testOutputFile.get());
+      }
+      if(e.getSource() == saveTests)
+      {
+         selectFileToSave();
+         saveTestConfig(testOutputFile.get());
+      }
+      if(e.getSource() == exit)
+      {
+         System.exit(0);
+      }
+      if(e.getSource() == extractTests)
+      {
+         selectPatternToOpen();
+      }
+      if(e.getSource() == reExtract)
+      {
+         updateTests(progPath.get(), progPattern.get(), false);
+      }
+      if(e.getSource() == close)
+      {
+         testClassList = new ClassList();
+         progClassList = new ClassList();
+         progPath.set("");
+         progPattern.set("");
+         testOutputFile.set("");
+         testOutputFilePath.set("");
+         fillTree(testClassList);
+         
+      }
+      
+      if(e.getSource() == add)
+      {
+         ClassInfo ci;
+         DefaultMutableTreeNode node = (DefaultMutableTreeNode)
+            testTree.getLastSelectedPathComponent();
+
+         if (node == null) 
+            return;
+         if(node.getUserObject().getClass().getName().equals("java.lang.String"))
+         {
+            String str = (String) node.getUserObject();
+            ci = testClassList.findClassWithName(str);
+         }
+         else
+         {
+            MethodInfo mi = (MethodInfo) node.getUserObject();
+            ci = testClassList.findClassWithMethod(mi);
+         }
+         int i = 0;
+         String testMethodName = ci.className + "TestUser" + i;
+         while(ci.methods.getMethodWithName(testMethodName) != null)
+            i++;
+         MethodInfo newMethod = new MethodInfo("   void " + testMethodName + "()", -1, null, ci.classIndex);
+         ci.methods.add(newMethod);
+         
+         //reset the tree
+         fillTree(testClassList);
+         
+         //select the latest tree
+         testTree.setSelectionPath(findObjectInTree(newMethod));
+      }
+      
+      if(e.getSource() == compile)
+      {
+         String path1 = System.getProperty("user.dir");
+         MethodInfo mi = getSelectedMI();
+         ClassInfo ci;
+         //did you select a class?
+         if(mi == null)
+         {
+            ci = testClassList.findClassWithName(getSelectedCI());
+            for(int i = 0; i < ci.methods.size(); i++)
+            {
+               mi = ci.methods.getMethod(i);
+               String fName = dumpTempTest(mi, path1);
+               String[] filePath = new String[2];
+               int j = fName.lastIndexOf("\\");
+               filePath[0] = fName.substring(0, j);
+               filePath[1] = fName.substring(j + 1, fName.length());
+               boolean status = compileTests(filePath[0], filePath[1]);
+               //report the status and get rid of the temp directory
+               if(status)
+                  mi.setCompileState(1);
+               else
+                  mi.setCompileState(2);
+               File f = new File(fName);
+               f.delete();
+            }
+         }
+         else
+         {
+            String fName = dumpTempTest(mi, path1);
+            String[] filePath = new String[2];
+            int i = fName.lastIndexOf("\\");
+            filePath[0] = fName.substring(0, i);
+            filePath[1] = fName.substring(i + 1, fName.length());
+            boolean status = compileTests(filePath[0], filePath[1]);
+            //report the status and get rid of the temp directory
+            if(status)
+               mi.setCompileState(1);
+            else
+               mi.setCompileState(2);
+            File f = new File(fName);
+            f.delete();
+         }
+         fillTree(testClassList);
+      }
+      
+      if(e.getSource() == run)
+      {
+         String path1 = System.getProperty("user.dir");
+         MethodInfo mi = getSelectedMI();
+         ClassInfo ci;
+         String[] tests;
+         //did you select a class?
+         if(mi == null)
+         {
+            ci = testClassList.findClassWithName(getSelectedCI());
+            tests = new String[ci.methods.size()];
+            for(int i = 0; i < ci.methods.size(); i++)
+            {
+               tests[i] = ci.methods.getMethod(i).name;
+            }   
+         }
+         else
+         {
+            tests = new String[1];
+            tests[0] = mi.name;
+            ci = testClassList.getClass(mi.classIndex);
+         }
+         String fName = dumpTestClass(ci, path1 + "\\" + ci.className + ".java", tests);
+         compileTests(path1, ci.className + ".java");
+         runTests(path1, ci.className + ".java");
+         fillTree(testClassList);
+      }
+      
+      fillTree(testClassList);
+   }
+
+   public void textValueChanged(TextEvent e)
+   {
+      DefaultMutableTreeNode node = (DefaultMutableTreeNode)
+         testTree.getLastSelectedPathComponent();
+      MethodInfo mi = (MethodInfo) node.getUserObject();
+      String str = ((JTextArea) e.getSource()).getText();
+      mi.setLines(str);
+   }
+
+   private String dumpTempTest(MethodInfo mi, String path)
+   {
+      //make a temp directory in the string path
+      String dirPath = path + "\\TempTest";
+      File f = new File(dirPath);
+      if(f.mkdir())
+      {
+         //make the temp class
+         ClassInfo tempClass = testClassList.findClassWithMethod(mi);
+         tempClass = tempClass.copyClass();
+         tempClass.methods.removeAllNonTestMethods();
+         tempClass.methods.add(mi);
+         
+         String classFile = new String(dirPath + "\\" + tempClass.className + "Test.java");
+         ClassList tempClassList = new ClassList();
+         tempClassList.add(tempClass);
+         tempClassList.save(classFile);
+         return classFile;
+      }
+      else
+      {
+         System.out.println("Failed to create temp directory \"TempTest\" in " + path);
+         return null;
+      }
+   }
+
+   private boolean compileTests(String path, String file)
+   {
+      try 
+      {
+         String line;
+         boolean success = true;
+         Process p = Runtime.getRuntime().exec("javac " + path + "\\" + file);
+         BufferedReader input =
+           new BufferedReader
+             (new InputStreamReader(p.getInputStream()));
+         while ((line = input.readLine()) != null) 
+         {
+           //System.out.println(line);
+           success = false;
+         }
+         input.close();
+         return success;
+      }
+      catch (Exception err) 
+      {
+         err.printStackTrace();
+         return false;
+      }
+   }
+
+   private String createTestMain(String[] tests)
+   {
+      String rtnVal = "   public static void main(String args[])\n";
+      rtnVal += "   {\n";
+      for(int i = 0; i < tests.length; i++)
+      {
+         rtnVal += "      " + tests[i] + "();\n";
+      }
+      rtnVal += "   }\n";
+      return rtnVal;
+   }
+
+   private String dumpTestClass(ClassInfo in, String path, String[] testList)
+   {
+      
+      ClassList temp = new ClassList();
+      String testMain = createTestMain(testList);
+      MethodInfo mi = new MethodInfo("public static void main(String args[])", 0, "", -1);
+      mi.setLines(testMain);
+      temp.add(in);
+      String outpath = path + in.className + ".java";
+      temp.save(outpath);
+      return outpath;
+   }
+
+   private int runTests(String path, String file)
+   {
+      try 
+      {
+         String[] f = file.split("\\.");
+         String line;
+         //java the path
+         Process p = Runtime.getRuntime().exec("java -classpath " + path + " " + f[0]);
+         BufferedReader input =
+           new BufferedReader
+             (new InputStreamReader(p.getInputStream()));
+         while ((line = input.readLine()) != null) 
+         {
+           //System.out.println(line);
+         }
+         input.close();
+         return p.exitValue();
+      }
+      catch (Exception err) 
+      {
+         err.printStackTrace();
+         return -1;
+      }
+   }
+
+   private void setupMenus()
+   {
+      menuBar = new JMenuBar();
+      fileMenu = new JMenu("File");
+      loadTests = new JMenuItem("Load tests...");
+      loadTests.addActionListener(this);
+      extractTests = new JMenuItem("Extract tests...");
+      extractTests.addActionListener(this);
+      saveTests = new JMenuItem("Save");
+      saveTests.addActionListener(this);
+      saveTestsAs = new JMenuItem("Save as...");
+      saveTestsAs.addActionListener(this);
+      saveJUnit = new JMenuItem("Save as JUnit...");
+      saveJUnit.addActionListener(this);
+      reExtract = new JMenuItem("Re-extract");
+      reExtract.addActionListener(this);
+      close = new JMenuItem("Close tests");
+      close.addActionListener(this);
+      exit = new JMenuItem("Exit");
+      exit.addActionListener(this);
+      
+      testMenu = new JMenu("Tests");
+      add = new JMenuItem("Add...");
+      add.addActionListener(this);
+      compile = new JMenuItem("Compile");
+      compile.addActionListener(this);
+      run = new JMenuItem("Run");
+      run.addActionListener(this);
+      
+      fileMenu.add(loadTests);
+      fileMenu.add(extractTests);
+      fileMenu.add(saveTests);
+      fileMenu.add(saveTestsAs);
+      fileMenu.add(saveJUnit);
+      fileMenu.addSeparator();
+      fileMenu.add(reExtract);
+      fileMenu.add(close);
+      fileMenu.addSeparator();
+      fileMenu.add(exit);
+      
+      testMenu.add(add);
+      testMenu.add(compile);
+      testMenu.add(run);
+      
+      menuBar.add(fileMenu);
+      menuBar.add(testMenu);
+      
+      setJMenuBar(menuBar);
+   }
+
+   private void selectPatternToOpen()
+   {
+      fsb = new FileSelectorBox(progPath, progPattern);
+      fsb.okBtn.addActionListener(this);
+      
+   }
+
+   private void selectFileToOpen()  //for loading tests
+   {
+      JFileChooser jfc = new JFileChooser(System.getProperty("user.dir"));
+      int returnVal = jfc.showOpenDialog(this);
+      if(returnVal == JFileChooser.APPROVE_OPTION)
+      {
+         progPath.set(jfc.getSelectedFile().getAbsolutePath());
+         progPattern.set(jfc.getSelectedFile().getName());
+      }
+   }
+
+   private void selectFileToSave()  //for saving tests
+   {
+      JFileChooser jfc = new JFileChooser(System.getProperty("user.dir"));
+      int returnVal = jfc.showOpenDialog(this);
+      if(returnVal == JFileChooser.APPROVE_OPTION)
+      {
+         testOutputFilePath.set(jfc.getSelectedFile().getAbsolutePath());
+         testOutputFile.set(jfc.getSelectedFile().getName());
+      }
+   }
+
+   private TestInfo getSelectedTI()
+   {
+	   DefaultMutableTreeNode node = (DefaultMutableTreeNode)
+          testTree.getLastSelectedPathComponent();
+	   try
+	   {
+		   return (TestInfo) node.getUserObject();
+	   }
+	   catch(ClassCastException cce)
+	   {
+		   return null;
+	   }   
+   }
+
+   private MethodInfo getSelectedMI()
+   {
+	   DefaultMutableTreeNode node = (DefaultMutableTreeNode)
+       testTree.getLastSelectedPathComponent();
+	   try
+	   {
+		   return (MethodInfo) node.getUserObject();
+	   }
+	   catch(ClassCastException cce)
+	   {
+		   return null;
+	   }
+   }
+
+   private String getSelectedCI()
+   {
+      DefaultMutableTreeNode node = (DefaultMutableTreeNode)
+         testTree.getLastSelectedPathComponent();
+      if(node.getUserObject().getClass().equals("java.lang.String"))
+      {
+         return (String) node.getUserObject();
+      }   
+      else
+         return null;
+   }
+
+   public void WhiteboxUITestCtor1_0()
+   {
+      WhiteboxUITests testClass = new WhiteboxUITests();
+      assert.areEqual(testClass.progPath,"");
+      assert.areEqual(testClass.progPattern,"");
+      assert.areEqual(testClass.testOutputFile,"");
+      assert.areEqual(testClass.testOutputFilePath,"");
+      assert.areEqual(testClass.testTop,"");
+      assert.areEqual(testClass.testTree,"");
+      assert.areEqual(testClass.testView,"");
+      assert.areEqual(testClass.testOutput,"");
+      assert.areEqual(testClass.methButton,"");
+      assert.areEqual(testClass.sysOutRedirect,"");
+   }
+   public void setupPathLabelsTestMeth1_0()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      setupPathLabels();
+      assert.areEqual(testClass0.pathLbls,"");
+      assert.areEqual(testClass0.progPtnLbl,"");
+      assert.areEqual(testClass0.toFileLbl,"");
+      assert.areEqual(testClass0.progPathLbl,"");
+      assert.areEqual(testClass0.toPathLbl,"");
+   }
+   public void expandTreeTestMeth1_0()
+   {
+   }
+   public void loadSettingsTestMeth1_0()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      loadSettings();
+      assert.areEqual(testClass0.classTestAppend,"");
+      assert.areEqual(testClass0.methodTestAppend,"");
+   }
+   public void loadProgramTestMeth1_0()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      loadProgram(01);
+      assert.areEqual(testClass0.progClassList,"");
+   }
+   public void updateTestsTestMeth1_0()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      updateTests(012);
+      assert.areEqual(testClass0.progClassList,"");
+      assert.areEqual(testClass0.testClassList,"");
+   }
+   public void updateTestsTestMeth1_1()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      updateTests(012);
+      assert.areEqual(testClass0.progClassList,"");
+      assert.areEqual(testClass0.testClassList,"");
+   }
+   public void updateTestsTestMeth1_2()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      updateTests(012);
+      assert.areEqual(testClass0.progClassList,"");
+      assert.areEqual(testClass0.testClassList,"");
+   }
+   public void updateTestsTestMeth1_3()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      updateTests(012);
+      assert.areEqual(testClass0.progClassList,"");
+      assert.areEqual(testClass0.testClassList,"");
+   }
+   public void updateTestsTestMeth1_4()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      updateTests(012);
+      assert.areEqual(testClass0.progClassList,"");
+      assert.areEqual(testClass0.testClassList,"");
+   }
+   public void updateTestsTestMeth1_5()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      updateTests(012);
+      assert.areEqual(testClass0.progClassList,"");
+      assert.areEqual(testClass0.testClassList,"");
+   }
+   public void updateTestsTestMeth1_6()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      updateTests(012);
+      assert.areEqual(testClass0.progClassList,"");
+      assert.areEqual(testClass0.testClassList,"");
+   }
+   public void updateTestsTestMeth1_7()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      updateTests(012);
+      assert.areEqual(testClass0.progClassList,"");
+      assert.areEqual(testClass0.testClassList,"");
+   }
+   public void updateTestsTestMeth1_8()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      updateTests(012);
+      assert.areEqual(testClass0.progClassList,"");
+      assert.areEqual(testClass0.testClassList,"");
+   }
+   public void updateTestsTestMeth1_9()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      updateTests(012);
+      assert.areEqual(testClass0.progClassList,"");
+      assert.areEqual(testClass0.testClassList,"");
+   }
+   public void updateTestsTestMeth1_10()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      updateTests(012);
+      assert.areEqual(testClass0.progClassList,"");
+      assert.areEqual(testClass0.testClassList,"");
+   }
+   public void updateTestsTestMeth1_11()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      updateTests(012);
+      assert.areEqual(testClass0.progClassList,"");
+      assert.areEqual(testClass0.testClassList,"");
+   }
+   public void updateTestsTestMeth1_12()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      updateTests(012);
+      assert.areEqual(testClass0.progClassList,"");
+      assert.areEqual(testClass0.testClassList,"");
+   }
+   public void updateTestsTestMeth1_13()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      updateTests(012);
+      assert.areEqual(testClass0.progClassList,"");
+      assert.areEqual(testClass0.testClassList,"");
+   }
+   public void updateTestsTestMeth1_14()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      updateTests(012);
+      assert.areEqual(testClass0.progClassList,"");
+      assert.areEqual(testClass0.testClassList,"");
+   }
+   public void updateTestsTestMeth1_15()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      updateTests(012);
+      assert.areEqual(testClass0.progClassList,"");
+      assert.areEqual(testClass0.testClassList,"");
+   }
+   public void getTestsTestMeth1_0()
+   {
+      ClassList rtnVal = getTests(01);
+      assert.areEqual(rtnVal,"");
+   }
+   public void getFileListTestMeth1_0()
+   {
+      String[] rtnVal = getFileList(01);
+      assert.areEqual(rtnVal,"");
+   }
+   public void getFileListTestMeth1_1()
+   {
+      String[] rtnVal = getFileList(01);
+      assert.areEqual(rtnVal,"");
+   }
+   public void fillAllOutputTestMeth1_0()
+   {
+   }
+   public void fillTreeTestMeth1_0()
+   {
+   }
+   public void fillTreeTestMeth1_1()
+   {
+   }
+   public void fillTestConfigTestMeth1_0()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      fillTestConfig(01);
+      assert.areEqual(testClass0.configTop,"");
+      assert.areEqual(testClass0.innerConfig,"");
+      assert.areEqual(testClass0.top,"");
+      assert.areEqual(testClass0.testConfig,"");
+   }
+   public void fillTestConfigTestMeth1_1()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      fillTestConfig(01);
+      assert.areEqual(testClass0.configTop,"");
+      assert.areEqual(testClass0.innerConfig,"");
+      assert.areEqual(testClass0.top,"");
+      assert.areEqual(testClass0.testConfig,"");
+   }
+   public void fillTestConfigTestMeth1_2()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      fillTestConfig(01);
+      assert.areEqual(testClass0.configTop,"");
+      assert.areEqual(testClass0.innerConfig,"");
+      assert.areEqual(testClass0.top,"");
+      assert.areEqual(testClass0.testConfig,"");
+   }
+   public void fillTestConfigTestMeth1_3()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      fillTestConfig(01);
+      assert.areEqual(testClass0.configTop,"");
+      assert.areEqual(testClass0.innerConfig,"");
+      assert.areEqual(testClass0.top,"");
+      assert.areEqual(testClass0.testConfig,"");
+   }
+   public void fillTestConfigTestMeth1_4()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      fillTestConfig(01);
+      assert.areEqual(testClass0.configTop,"");
+      assert.areEqual(testClass0.innerConfig,"");
+      assert.areEqual(testClass0.top,"");
+      assert.areEqual(testClass0.testConfig,"");
+   }
+   public void fillTestConfigTestMeth1_5()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      fillTestConfig(01);
+      assert.areEqual(testClass0.configTop,"");
+      assert.areEqual(testClass0.innerConfig,"");
+      assert.areEqual(testClass0.top,"");
+      assert.areEqual(testClass0.testConfig,"");
+   }
+   public void fillTestConfigTestMeth1_6()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      fillTestConfig(01);
+      assert.areEqual(testClass0.configTop,"");
+      assert.areEqual(testClass0.innerConfig,"");
+      assert.areEqual(testClass0.top,"");
+      assert.areEqual(testClass0.testConfig,"");
+   }
+   public void fillTestConfigTestMeth1_7()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      fillTestConfig(01);
+      assert.areEqual(testClass0.configTop,"");
+      assert.areEqual(testClass0.innerConfig,"");
+      assert.areEqual(testClass0.top,"");
+      assert.areEqual(testClass0.testConfig,"");
+   }
+   public void openWbcfileTestMeth1_0()
+   {
+      String[] rtnVal = openWbcfile();
+      assert.areEqual(rtnVal,"");
+   }
+   public void loadTestConfigTestMeth1_0()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      loadTestConfig(0);
+      assert.areEqual(testClass0.testClassList,"");
+   }
+   public void saveTestConfigTestMeth1_0()
+   {
+   }
+   public void saveTestsTestMeth1_0()
+   {
+      String rtnVal = saveTests();
+      assert.areEqual(rtnVal,"");
+   }
+   public void saveTestsTestMeth1_1()
+   {
+      String rtnVal = saveTests();
+      assert.areEqual(rtnVal,"");
+   }
+   public void fillErrorsTestMeth1_0()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      fillErrors();
+      assert.areEqual(testClass0.errorScroll,"");
+      assert.areEqual(testClass0.errors,"");
+   }
+   public void fillSysoutTestMeth1_0()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      fillSysout();
+      assert.areEqual(testClass0.sysOutScroll,"");
+      assert.areEqual(testClass0.sysOut,"");
+   }
+   public void valueChangedTestMeth1_0()
+   {
+      void rtnVal = valueChanged(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void valueChangedTestMeth1_1()
+   {
+      void rtnVal = valueChanged(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void findObjectInTreeTestMeth1_0()
+   {
+      TreePath rtnVal = findObjectInTree(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void actionPerformedTestMeth1_0()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      void rtnVal = actionPerformed(0);
+      assert.areEqual(rtnVal,"");
+      assert.areEqual(testClass0.testClassList,"");
+      assert.areEqual(testClass0.progClassList,"");
+   }
+   public void actionPerformedTestMeth1_1()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      void rtnVal = actionPerformed(0);
+      assert.areEqual(rtnVal,"");
+      assert.areEqual(testClass0.testClassList,"");
+      assert.areEqual(testClass0.progClassList,"");
+   }
+   public void actionPerformedTestMeth1_2()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      void rtnVal = actionPerformed(0);
+      assert.areEqual(rtnVal,"");
+      assert.areEqual(testClass0.testClassList,"");
+      assert.areEqual(testClass0.progClassList,"");
+   }
+   public void actionPerformedTestMeth1_3()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      void rtnVal = actionPerformed(0);
+      assert.areEqual(rtnVal,"");
+      assert.areEqual(testClass0.testClassList,"");
+      assert.areEqual(testClass0.progClassList,"");
+   }
+   public void actionPerformedTestMeth1_4()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      void rtnVal = actionPerformed(0);
+      assert.areEqual(rtnVal,"");
+      assert.areEqual(testClass0.testClassList,"");
+      assert.areEqual(testClass0.progClassList,"");
+   }
+   public void actionPerformedTestMeth1_5()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      void rtnVal = actionPerformed(0);
+      assert.areEqual(rtnVal,"");
+      assert.areEqual(testClass0.testClassList,"");
+      assert.areEqual(testClass0.progClassList,"");
+   }
+   public void actionPerformedTestMeth1_6()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      void rtnVal = actionPerformed(0);
+      assert.areEqual(rtnVal,"");
+      assert.areEqual(testClass0.testClassList,"");
+      assert.areEqual(testClass0.progClassList,"");
+   }
+   public void actionPerformedTestMeth1_7()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      void rtnVal = actionPerformed(0);
+      assert.areEqual(rtnVal,"");
+      assert.areEqual(testClass0.testClassList,"");
+      assert.areEqual(testClass0.progClassList,"");
+   }
+   public void actionPerformedTestMeth1_8()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      void rtnVal = actionPerformed(0);
+      assert.areEqual(rtnVal,"");
+      assert.areEqual(testClass0.testClassList,"");
+      assert.areEqual(testClass0.progClassList,"");
+   }
+   public void actionPerformedTestMeth1_9()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      void rtnVal = actionPerformed(0);
+      assert.areEqual(rtnVal,"");
+      assert.areEqual(testClass0.testClassList,"");
+      assert.areEqual(testClass0.progClassList,"");
+   }
+   public void actionPerformedTestMeth1_10()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      void rtnVal = actionPerformed(0);
+      assert.areEqual(rtnVal,"");
+      assert.areEqual(testClass0.testClassList,"");
+      assert.areEqual(testClass0.progClassList,"");
+   }
+   public void actionPerformedTestMeth1_11()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      void rtnVal = actionPerformed(0);
+      assert.areEqual(rtnVal,"");
+      assert.areEqual(testClass0.testClassList,"");
+      assert.areEqual(testClass0.progClassList,"");
+   }
+   public void actionPerformedTestMeth1_12()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      void rtnVal = actionPerformed(0);
+      assert.areEqual(rtnVal,"");
+      assert.areEqual(testClass0.testClassList,"");
+      assert.areEqual(testClass0.progClassList,"");
+   }
+   public void actionPerformedTestMeth1_13()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      void rtnVal = actionPerformed(0);
+      assert.areEqual(rtnVal,"");
+      assert.areEqual(testClass0.testClassList,"");
+      assert.areEqual(testClass0.progClassList,"");
+   }
+   public void actionPerformedTestMeth1_14()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      void rtnVal = actionPerformed(0);
+      assert.areEqual(rtnVal,"");
+      assert.areEqual(testClass0.testClassList,"");
+      assert.areEqual(testClass0.progClassList,"");
+   }
+   public void actionPerformedTestMeth1_15()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      void rtnVal = actionPerformed(0);
+      assert.areEqual(rtnVal,"");
+      assert.areEqual(testClass0.testClassList,"");
+      assert.areEqual(testClass0.progClassList,"");
+   }
+   public void actionPerformedTestMeth1_16()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      void rtnVal = actionPerformed(0);
+      assert.areEqual(rtnVal,"");
+      assert.areEqual(testClass0.testClassList,"");
+      assert.areEqual(testClass0.progClassList,"");
+   }
+   public void actionPerformedTestMeth1_17()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      void rtnVal = actionPerformed(0);
+      assert.areEqual(rtnVal,"");
+      assert.areEqual(testClass0.testClassList,"");
+      assert.areEqual(testClass0.progClassList,"");
+   }
+   public void actionPerformedTestMeth1_18()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      void rtnVal = actionPerformed(0);
+      assert.areEqual(rtnVal,"");
+      assert.areEqual(testClass0.testClassList,"");
+      assert.areEqual(testClass0.progClassList,"");
+   }
+   public void actionPerformedTestMeth1_19()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      void rtnVal = actionPerformed(0);
+      assert.areEqual(rtnVal,"");
+      assert.areEqual(testClass0.testClassList,"");
+      assert.areEqual(testClass0.progClassList,"");
+   }
+   public void actionPerformedTestMeth1_20()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      void rtnVal = actionPerformed(0);
+      assert.areEqual(rtnVal,"");
+      assert.areEqual(testClass0.testClassList,"");
+      assert.areEqual(testClass0.progClassList,"");
+   }
+   public void actionPerformedTestMeth1_21()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      void rtnVal = actionPerformed(0);
+      assert.areEqual(rtnVal,"");
+      assert.areEqual(testClass0.testClassList,"");
+      assert.areEqual(testClass0.progClassList,"");
+   }
+   public void actionPerformedTestMeth1_22()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      void rtnVal = actionPerformed(0);
+      assert.areEqual(rtnVal,"");
+      assert.areEqual(testClass0.testClassList,"");
+      assert.areEqual(testClass0.progClassList,"");
+   }
+   public void actionPerformedTestMeth1_23()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      void rtnVal = actionPerformed(0);
+      assert.areEqual(rtnVal,"");
+      assert.areEqual(testClass0.testClassList,"");
+      assert.areEqual(testClass0.progClassList,"");
+   }
+   public void actionPerformedTestMeth1_24()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      void rtnVal = actionPerformed(0);
+      assert.areEqual(rtnVal,"");
+      assert.areEqual(testClass0.testClassList,"");
+      assert.areEqual(testClass0.progClassList,"");
+   }
+   public void actionPerformedTestMeth1_25()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      void rtnVal = actionPerformed(0);
+      assert.areEqual(rtnVal,"");
+      assert.areEqual(testClass0.testClassList,"");
+      assert.areEqual(testClass0.progClassList,"");
+   }
+   public void actionPerformedTestMeth1_26()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      void rtnVal = actionPerformed(0);
+      assert.areEqual(rtnVal,"");
+      assert.areEqual(testClass0.testClassList,"");
+      assert.areEqual(testClass0.progClassList,"");
+   }
+   public void actionPerformedTestMeth1_27()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      void rtnVal = actionPerformed(0);
+      assert.areEqual(rtnVal,"");
+      assert.areEqual(testClass0.testClassList,"");
+      assert.areEqual(testClass0.progClassList,"");
+   }
+   public void actionPerformedTestMeth1_28()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      void rtnVal = actionPerformed(0);
+      assert.areEqual(rtnVal,"");
+      assert.areEqual(testClass0.testClassList,"");
+      assert.areEqual(testClass0.progClassList,"");
+   }
+   public void actionPerformedTestMeth1_29()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      void rtnVal = actionPerformed(0);
+      assert.areEqual(rtnVal,"");
+      assert.areEqual(testClass0.testClassList,"");
+      assert.areEqual(testClass0.progClassList,"");
+   }
+   public void actionPerformedTestMeth1_30()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      void rtnVal = actionPerformed(0);
+      assert.areEqual(rtnVal,"");
+      assert.areEqual(testClass0.testClassList,"");
+      assert.areEqual(testClass0.progClassList,"");
+   }
+   public void actionPerformedTestMeth1_31()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      void rtnVal = actionPerformed(0);
+      assert.areEqual(rtnVal,"");
+      assert.areEqual(testClass0.testClassList,"");
+      assert.areEqual(testClass0.progClassList,"");
+   }
+   public void textValueChangedTestMeth1_0()
+   {
+   }
+   public void dumpTempTestTestMeth1_0()
+   {
+      String rtnVal = dumpTempTest(01);
+      assert.areEqual(rtnVal,"");
+   }
+   public void dumpTempTestTestMeth1_1()
+   {
+      String rtnVal = dumpTempTest(01);
+      assert.areEqual(rtnVal,"");
+   }
+   public void compileTestsTestMeth1_0()
+   {
+      boolean rtnVal = compileTests(01);
+      assert.areEqual(rtnVal,"");
+   }
+   public void createTestMainTestMeth1_0()
+   {
+      String rtnVal = createTestMain(0);
+      assert.areEqual(rtnVal,"");
+   }
+   public void dumpTestClassTestMeth1_0()
+   {
+      String rtnVal = dumpTestClass(012);
+      assert.areEqual(rtnVal,"");
+   }
+   public void runTestsTestMeth1_0()
+   {
+      int rtnVal = runTests(01);
+      assert.areEqual(rtnVal,"");
+   }
+   public void setupMenusTestMeth1_0()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      setupMenus();
+      assert.areEqual(testClass0.menuBar,"");
+      assert.areEqual(testClass0.fileMenu,"");
+      assert.areEqual(testClass0.loadTests,"");
+      assert.areEqual(testClass0.extractTests,"");
+      assert.areEqual(testClass0.saveTests,"");
+      assert.areEqual(testClass0.saveTestsAs,"");
+      assert.areEqual(testClass0.saveJUnit,"");
+      assert.areEqual(testClass0.reExtract,"");
+      assert.areEqual(testClass0.close,"");
+      assert.areEqual(testClass0.exit,"");
+      assert.areEqual(testClass0.testMenu,"");
+      assert.areEqual(testClass0.add,"");
+      assert.areEqual(testClass0.compile,"");
+      assert.areEqual(testClass0.run,"");
+   }
+   public void selectPatternToOpenTestMeth1_0()
+   {
+      WhiteboxUI testClass0 = new WhiteboxUITest();
+      selectPatternToOpen();
+      assert.areEqual(testClass0.fsb,"");
+   }
+   public void selectFileToOpenTestMeth1_0()
+   {
+   }
+   public void selectFileToOpenTestMeth1_1()
+   {
+   }
+   public void selectFileToSaveTestMeth1_0()
+   {
+   }
+   public void selectFileToSaveTestMeth1_1()
+   {
+   }
+   public void getSelectedTITestMeth1_0()
+   {
+      TestInfo rtnVal = getSelectedTI();
+      assert.areEqual(rtnVal,"");
+   }
+   public void getSelectedMITestMeth1_0()
+   {
+      MethodInfo rtnVal = getSelectedMI();
+      assert.areEqual(rtnVal,"");
+   }
+   public void getSelectedCITestMeth1_0()
+   {
+      String rtnVal = getSelectedCI();
+      assert.areEqual(rtnVal,"");
+   }
+   public void getSelectedCITestMeth1_1()
+   {
+      String rtnVal = getSelectedCI();
+      assert.areEqual(rtnVal,"");
+   }
+}
+class FunctionViewPanelTests
+{
+   MethodInfo methodInfo;
+   String[] codeList;
+   AssertionList asserts;
+   String showName;
+   Font mFont;
+   FontMetrics fm;
+   int fontHeight;
+   int fontWidth;
+   int boxWidth;
+   int boxHeight;
+   int viewWidth;
+   int viewHeight;
+
+   FunctionViewPanelTests(MethodInfo input)
+   {
+      super();
+      setup(input);
+   }
+
+   FunctionViewPanelTests(TestInfo input)
+   {
+	   super();
+	   setup(input);
+   }
+
+   FunctionViewPanelTests(String filename)
+   {
+      super();
+      String[] function = WhiteboxUtils.loadFile(filename);
+      
+      //random assertions
+      MethodInfo mi = new MethodInfo(function[0], 1, "VarInfo", 0);
+      for(int i = 0; i < 5; i++)
+      {
+         int randNum = (int) (Math.random() * function.length * 1.0);
+         AssertionInfo ai = new AssertionInfo(randNum);
+         mi.asserts.addAssertion(ai);
+      }
+      mi.setLines(function);
+      setup(mi);
+   }
+
+   private void setup(MethodInfo input)
+   {
+      methodInfo = input;
+      showName = methodInfo.name;
+      asserts = input.asserts;
+      codeList = methodInfo.lines;
+      setup2();
+   }
+
+   private void setup(TestInfo ti)
+   {
+	  methodInfo = ti.assocMethod;
+	  showName = ti.commentName;
+	  asserts = ti.asserts;
+	  codeList = ti.testLines;
+	  setup2();
+   }
+
+   private void setup2()
+   {
+	  mFont = new Font("monospaced", Font.PLAIN, 12);
+      fm = getFontMetrics(mFont);
+      fontHeight = fm.getHeight();
+      fontWidth = fm.charWidth('w');
+      int width = 0;
+      for(int i = 0; i < codeList.length; i++)
+      {
+         if(width < codeList[i].length())
+            width = codeList[i].length();
+      }
+      boxWidth = width * fontWidth;
+      boxHeight = codeList.length * fontHeight + fontHeight;
+      setPreferredSize(new Dimension(boxWidth, boxHeight)); 
+   }
+
+   public void paintComponent(Graphics g)
+   {
+      super.paintComponent(g);
+      g.setColor(new Color(203,203,203));
+      g.fillRect(0, 0, getWidth(), getHeight());
+      g.setColor(Color.RED);
+      for(int i = 0; i < asserts.size(); i++)
+      {
+         AssertionInfo ai = asserts.getAssertion(i);
+         int boxY = (ai.line - methodInfo.startLine) * fontHeight + 3;
+         g.fillRect(0, boxY, boxWidth, fontHeight);
+      }
+      
+      g.setColor(Color.BLACK);
+      g.setFont(mFont);
+      //String fstr[] = methodInfo.lines;
+      for(int i = 0; i < codeList.length; i++)
+         g.drawString(codeList[i], 0, fontHeight * (i + 1));
+      //revalidate();
+   }
+
+   public void setViewSize(int w, int h)
+   {
+      viewWidth = w;
+      viewHeight = h;
+   }
+
+   public String getFunctionName()
+   {
+      return(methodInfo.returnType.type + " " + showName);
+   }
+
+   public Dimension getPreferredScrollableViewportSize() 
+   {
+      return getPreferredSize();
+   }
+
+   public int getScrollableBlockIncrement(Rectangle arg0, int arg1, int arg2) 
+   {
+      return 5 * fontHeight;
+   }
+
+   public boolean getScrollableTracksViewportHeight() 
+   {
+      return false;
+   }
+
+   public boolean getScrollableTracksViewportWidth() 
+   {
+      return false;
+   }
+
+   public int getScrollableUnitIncrement(Rectangle arg0, int arg1, int arg2) 
+   {
+      return fontHeight;
+   }
+
+   public void FunctionViewPanelTestCtor1_0()
+   {
+   }
+   public void FunctionViewPanelTestCtor2_0()
+   {
+   }
+   public void FunctionViewPanelTestCtor3_0()
+   {
+   }
+   public void setupTestMeth1_0()
+   {
+      FunctionViewPanel testClass0 = new FunctionViewPanelTest();
+      setup(0);
+      assert.areEqual(testClass0.methodInfo,"");
+      assert.areEqual(testClass0.showName,"");
+      assert.areEqual(testClass0.asserts,"");
+      assert.areEqual(testClass0.codeList,"");
+   }
+   public void setupTestMeth2_0()
+   {
+      FunctionViewPanel testClass0 = new FunctionViewPanelTest();
+      setup(0);
+      assert.areEqual(testClass0.methodInfo,"");
+      assert.areEqual(testClass0.showName,"");
+      assert.areEqual(testClass0.asserts,"");
+      assert.areEqual(testClass0.codeList,"");
+   }
+   public void setup2TestMeth1_0()
+   {
+      FunctionViewPanel testClass0 = new FunctionViewPanelTest();
+      setup2();
+      assert.areEqual(testClass0.mFont,"");
+      assert.areEqual(testClass0.fm,"");
+      assert.areEqual(testClass0.fontHeight,"");
+      assert.areEqual(testClass0.fontWidth,"");
+      assert.areEqual(testClass0.boxWidth,"");
+      assert.areEqual(testClass0.boxHeight,"");
+   }
+   public void setup2TestMeth1_1()
+   {
+      FunctionViewPanel testClass0 = new FunctionViewPanelTest();
+      setup2();
+      assert.areEqual(testClass0.mFont,"");
+      assert.areEqual(testClass0.fm,"");
+      assert.areEqual(testClass0.fontHeight,"");
+      assert.areEqual(testClass0.fontWidth,"");
+      assert.areEqual(testClass0.boxWidth,"");
+      assert.areEqual(testClass0.boxHeight,"");
+   }
+   public void paintComponentTestMeth1_0()
+   {
+   }
+   public void setViewSizeTestMeth1_0()
+   {
+      FunctionViewPanel testClass0 = new FunctionViewPanelTest();
+      setViewSize(01);
+      assert.areEqual(testClass0.viewWidth,"");
+      assert.areEqual(testClass0.viewHeight,"");
+   }
+   public void getFunctionNameTestMeth1_0()
+   {
+      String rtnVal = getFunctionName();
+      assert.areEqual(rtnVal,"");
+   }
+   public void getPreferredScrollableViewportSizeTestMeth1_0()
+   {
+      Dimension rtnVal = getPreferredScrollableViewportSize();
+      assert.areEqual(rtnVal,"");
+   }
+   public void getScrollableBlockIncrementTestMeth1_0()
+   {
+      int rtnVal = getScrollableBlockIncrement(012);
+      assert.areEqual(rtnVal,"");
+   }
+   public void getScrollableTracksViewportHeightTestMeth1_0()
+   {
+      boolean rtnVal = getScrollableTracksViewportHeight();
+      assert.areEqual(rtnVal,"");
+   }
+   public void getScrollableTracksViewportWidthTestMeth1_0()
+   {
+      boolean rtnVal = getScrollableTracksViewportWidth();
+      assert.areEqual(rtnVal,"");
+   }
+   public void getScrollableUnitIncrementTestMeth1_0()
+   {
+      int rtnVal = getScrollableUnitIncrement(012);
+      assert.areEqual(rtnVal,"");
+   }
+}
+class FileSelectorBoxTests
+{
+   StringRef path;
+   StringRef pattern;
+   JTextField pathTxt;
+   JTextField patternTxt;
+   JButton browseBtn;
+   JButton okBtn;
+   JPanel top;
+   JPanel mid;
+   JPanel bottom;
+   JPanel main;
+
+   FileSelectorBoxTests()
+   {
+      this(new StringRef(System.getProperty("user.dir")), new StringRef("*.java"));
+   }
+
+   FileSelectorBoxTests(StringRef pth, StringRef ptn)
+   {
+      path = pth;
+      pattern = ptn;
+      setup();
+   }
+
+   public void setup()
+   {
+      JLabel pathLbl = new JLabel("Path:");
+      JLabel ptnLbl = new JLabel("Pattern:");
+      pathTxt = new JTextField(path.get());
+      patternTxt = new JTextField(pattern.get());
+      browseBtn = new JButton("Browse...");
+      browseBtn.addActionListener(this);
+      okBtn = new JButton("OK");
+      //okBtn.addActionListener(this);
+      
+      top = new JPanel(new BorderLayout());
+      top.add(pathLbl, BorderLayout.WEST);
+      top.add(pathTxt, BorderLayout.CENTER);
+      top.add(browseBtn, BorderLayout.EAST);
+      
+      mid = new JPanel(new BorderLayout());
+      mid.add(ptnLbl, BorderLayout.WEST);
+      mid.add(patternTxt, BorderLayout.CENTER);
+      
+      bottom = new JPanel(new BorderLayout());
+      bottom.add(okBtn, BorderLayout.EAST);
+      
+      main = new JPanel(new GridLayout(3, 1));
+      main.add(top);
+      main.add(mid);
+      main.add(bottom);
+      
+      getContentPane().add(main, BorderLayout.CENTER);
+      setVisible(true);
+   }
+
+   public StringRef getPattern()
+   {
+      return pattern;
+   }
+
+   public StringRef getPath()
+   {
+      return path;
+   }
+
+   public void actionPerformed(ActionEvent e)
+   {
+      if(e.getSource() == browseBtn)
+      {
+         //open the jfc
+         JFileChooser jfc = new JFileChooser(System.getProperty("user.dir"));
+         int returnVal = jfc.showOpenDialog(this);
+         if(returnVal == JFileChooser.APPROVE_OPTION)
+         {
+            path.set(jfc.getSelectedFile().getAbsolutePath());
+            pathTxt.setText(path.get());
+         }
+      }
+      else
+      {
+         
+      }
+   }
+
+   public void FileSelectorBoxTestCtor1_0()
+   {
+   }
+   public void FileSelectorBoxTestCtor2_0()
+   {
+      FileSelectorBoxTests testClass = new FileSelectorBoxTests(01);
+      assert.areEqual(testClass.path,"");
+      assert.areEqual(testClass.pattern,"");
+   }
+   public void setupTestMeth1_0()
+   {
+      FileSelectorBox testClass0 = new FileSelectorBoxTest();
+      setup();
+      assert.areEqual(testClass0.pathTxt,"");
+      assert.areEqual(testClass0.patternTxt,"");
+      assert.areEqual(testClass0.browseBtn,"");
+      assert.areEqual(testClass0.okBtn,"");
+      assert.areEqual(testClass0.top,"");
+      assert.areEqual(testClass0.mid,"");
+      assert.areEqual(testClass0.bottom,"");
+      assert.areEqual(testClass0.main,"");
+   }
+   public void getPatternTestMeth1_0()
+   {
+      StringRef rtnVal = getPattern();
+      assert.areEqual(rtnVal,"");
+   }
+   public void getPathTestMeth1_0()
+   {
+      StringRef rtnVal = getPath();
+      assert.areEqual(rtnVal,"");
+   }
+   public void actionPerformedTestMeth1_0()
+   {
+   }
+   public void actionPerformedTestMeth1_1()
+   {
+   }
+   public void actionPerformedTestMeth1_2()
+   {
+   }
+}
+class FunctionViewUITests
+{
+   FunctionViewPanel pne;
+   JTextArea txt;
+   JScrollPane spne;
+   JPanel panel;
+
+   FunctionViewUITests(MethodInfo mi)
+   {
+      setSize(400,200);
+      pne = new FunctionViewPanel(mi);
+      setTitle(pne.getFunctionName());
+      
+      //txt = new JTextArea("Hello\nHow are you?\nI am fine");
+      spne = new JScrollPane(/*JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS*/);
+      
+      spne.setViewportView(pne);
+      
+      panel = new JPanel();
+      panel.add(spne);
+      
+      getContentPane().add(spne, BorderLayout.CENTER);
+      setVisible(true);
+      //int j = 5;
+   }
+
+   public void FunctionViewUITestCtor1_0()
+   {
+      FunctionViewUITests testClass = new FunctionViewUITests(0);
+      assert.areEqual(testClass.pne,"");
+      assert.areEqual(testClass.spne,"");
+      assert.areEqual(testClass.panel,"");
+   }
+}
+class WhiteboxGUITests
+{
+   JEditorPane pne;
+
+   public static void main(String[] args)
+   {
+      WhiteboxUI ui = new WhiteboxUI();
+   }
+
+   public void mainTestMeth1_0()
+   {
+   }
+}
+

@@ -1,0 +1,42 @@
+
+[TestFixture]
+class WhiteboxUtilsTests extends WhiteboxUtils
+{
+   [Test]
+   public void getAccessLevelTest()
+   {
+      int rtnVal = getAccessLevel(0);
+      assert.areEqual(rtnVal,"");
+   }
+   [Test]
+   public void tokenizeLineTest()
+   {
+      String[] rtnVal = tokenizeLine(0);
+      assert.areEqual(rtnVal,"");
+   }
+   [Test]
+   public void removeAccessModifiersTest()
+   {
+      String rtnVal = removeAccessModifiers(0);
+      assert.areEqual(rtnVal,"");
+   }
+   [Test]
+   public void removeStringsTest()
+   {
+      String rtnVal = removeStrings(0);
+      assert.areEqual(rtnVal,"");
+   }
+   [Test]
+   public void removeCommentsTest()
+   {
+      String rtnVal = removeComments(0);
+      assert.areEqual(rtnVal,"");
+   }
+   [Test]
+   public void loadFileTest()
+   {
+      String[] rtnVal = loadFile(0);
+      assert.areEqual(rtnVal,"");
+   }
+}
+

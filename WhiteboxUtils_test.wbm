@@ -1,0 +1,66 @@
+Class:WhiteboxUtils:11 methods
+   Method:getAccessLevel:2 tests
+      Test:null:null
+      Test:null:null
+   Method:tokenizeLine:1 tests
+      Test:null:null
+   Method:removeAccessModifiers:1 tests
+      Test:null:null
+   Method:removeNonCode:1 tests
+      Test:null:null
+   Method:removeStrings:5 tests
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+   Method:removeComments:20 tests
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+   Method:endTailComment:1 tests
+      Test:null:null
+   Method:getWbtPattern:1 tests
+      Test:null:null
+   Method:loadFile:2 tests
+      Test:null:null
+      Test:null:null
+   Method:isInString:4 tests
+      Test:null:null
+      Test:null:null
+      Test:null:null
+      Test:null:null
+   Method:findClosingParen:2 tests
+      Test:null:null
+      Test:null:null
+Class:AssertionFailureException:1 methods
+   Method:AssertionFailureException:1 tests
+      Test:null:null
+Class:Assert:3 methods
+   Method:areEqual:2 tests
+      Test:null:null
+      Test:null:null
+   Method:areEqual:2 tests
+      Test:null:null
+      Test:null:null
+   Method:areEqual:2 tests
+      Test:null:null
+      Test:null:null
+

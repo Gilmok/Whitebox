@@ -1,0 +1,192 @@
+WhiteboxProgram: 1
+[#1 Type:0 Paths:1]
+=====================
+generateSynTree: 1
+[#1 Type:0 Paths:1]
+=====================
+listInterTree: 1
+[#1 Type:0 Paths:1]
+=====================
+buildSynTree: 1
+[#1 Type:0 Paths:1]
+=====================
+loadGrammarMap: 1
+[#1 Type:0 Paths:1]
+=====================
+pruneParseTree: 481
+[#1 Type:0 Paths:481]
+[#2(1) Type:-1 Paths:481]
+[#3(2) Type:1 Paths:480][#4(2) Type:2 Paths:1]
+[#5(3) Type:-1 Paths:2][#6(3) Type:-1 Paths:2][#7(3) Type:-1 Paths:5][#8(3) Type:-1 Paths:6][#9(3) Type:-1 Paths:2][#10(3) Type:-1 Paths:2]
+[#11(5) Type:1 Paths:1][#12(5) Type:2 Paths:1][#13(6) Type:1 Paths:1][#14(6) Type:2 Paths:1][#15(7) Type:1 Paths:4][#16(7) Type:2 Paths:1][#17(8) Type:1 Paths:5][#18(8) Type:2 Paths:1][#19(9) Type:1 Paths:1][#20(9) Type:2 Paths:1][#21(10) Type:1 Paths:1][#22(10) Type:2 Paths:1]
+[#23(15) Type:-1 Paths:2][#24(15) Type:-1 Paths:2][#25(17) Type:-1 Paths:5]
+[#26(23) Type:1 Paths:1][#27(23) Type:2 Paths:1][#28(24) Type:1 Paths:1][#29(24) Type:2 Paths:1][#30(25) Type:1 Paths:4][#31(25) Type:2 Paths:1]
+[#32(30) Type:-1 Paths:2][#33(30) Type:-1 Paths:2]
+[#34(32) Type:1 Paths:1][#35(32) Type:2 Paths:1][#36(33) Type:1 Paths:1][#37(33) Type:2 Paths:1]
+=====================
+generateSynTree: 400
+[#1 Type:0 Paths:400]
+[#2(1) Type:-1 Paths:2][#3(1) Type:-1 Paths:2][#4(1) Type:-1 Paths:2][#5(1) Type:-1 Paths:5][#6(1) Type:-1 Paths:2][#7(1) Type:-1 Paths:5]
+[#8(2) Type:1 Paths:1][#9(2) Type:2 Paths:1][#10(3) Type:1 Paths:1][#11(3) Type:2 Paths:1][#12(4) Type:1 Paths:1][#13(4) Type:2 Paths:1][#14(5) Type:1 Paths:1][#15(5) Type:2 Paths:4][#16(6) Type:1 Paths:1][#17(6) Type:2 Paths:1][#18(7) Type:1 Paths:4][#19(7) Type:2 Paths:1]
+[#20(15) Type:-1 Paths:4][#21(18) Type:-1 Paths:4]
+[#22(20) Type:1 Paths:1][#23(20) Type:2 Paths:3][#24(21) Type:1 Paths:2][#25(21) Type:2 Paths:2]
+[#26(23) Type:-1 Paths:3][#27(24) Type:-1 Paths:2][#28(25) Type:-1 Paths:2]
+[#29(26) Type:1 Paths:1][#30(26) Type:2 Paths:2][#31(27) Type:1 Paths:1][#32(27) Type:2 Paths:1][#33(28) Type:1 Paths:1][#34(28) Type:2 Paths:1]
+[#35(30) Type:-1 Paths:2]
+[#36(35) Type:1 Paths:1][#37(35) Type:2 Paths:1]
+=====================
+groupMethodLine: 1
+[#1 Type:0 Paths:1]
+=====================
+findAssertionsAndTests: 2
+[#1 Type:0 Paths:2]
+[#2(1) Type:-1 Paths:2]
+[#3(2) Type:1 Paths:1][#4(2) Type:2 Paths:1]
+=====================
+generateTests: 2
+[#1 Type:0 Paths:2]
+[#2(1) Type:-1 Paths:2]
+[#3(2) Type:1 Paths:1][#4(2) Type:2 Paths:1]
+=====================
+saveTests: 1
+[#1 Type:0 Paths:1]
+=====================
+getClassList: 1
+[#1 Type:0 Paths:1]
+=====================
+getSyntaxTree: 1
+[#1 Type:0 Paths:1]
+=====================
+getTestSynTree: 4
+[#1 Type:0 Paths:4]
+[#2(1) Type:-1 Paths:4]
+[#3(2) Type:1 Paths:1][#4(2) Type:2 Paths:3]
+[#5(4) Type:-1 Paths:3]
+[#6(5) Type:1 Paths:1][#7(5) Type:2 Paths:2]
+[#8(7) Type:-1 Paths:2]
+[#9(8) Type:1 Paths:1][#10(8) Type:2 Paths:1]
+=====================
+loadFile: 2
+[#1 Type:0 Paths:2]
+[#2(1) Type:-1 Paths:2]
+[#3(2) Type:1 Paths:1][#4(2) Type:2 Paths:1]
+=====================
+dumpTests: 2
+[#1 Type:0 Paths:2]
+[#2(1) Type:-1 Paths:2]
+[#3(2) Type:1 Paths:1][#4(2) Type:2 Paths:1]
+=====================
+getTestManifest: 1
+[#1 Type:0 Paths:1]
+=====================
+generateTest: 196
+[#1 Type:0 Paths:196]
+[#2(1) Type:-1 Paths:7][#3(1) Type:-1 Paths:4][#4(1) Type:-1 Paths:7]
+[#5(2) Type:1 Paths:6][#6(2) Type:2 Paths:1][#7(3) Type:1 Paths:3][#8(3) Type:2 Paths:1][#9(4) Type:1 Paths:1][#10(4) Type:2 Paths:6]
+[#11(5) Type:-1 Paths:2][#12(5) Type:-1 Paths:3][#13(7) Type:-1 Paths:3][#14(10) Type:-1 Paths:6]
+[#15(11) Type:1 Paths:1][#16(11) Type:2 Paths:1][#17(12) Type:1 Paths:2][#18(12) Type:2 Paths:1][#19(13) Type:1 Paths:1][#20(13) Type:2 Paths:2][#21(14) Type:1 Paths:1][#22(14) Type:2 Paths:5]
+[#23(17) Type:-1 Paths:2][#24(20) Type:-1 Paths:2][#25(22) Type:-1 Paths:5]
+[#26(23) Type:1 Paths:1][#27(23) Type:2 Paths:1][#28(24) Type:1 Paths:1][#29(24) Type:2 Paths:1][#30(25) Type:1 Paths:4][#31(25) Type:2 Paths:1]
+[#32(30) Type:-1 Paths:2][#33(30) Type:-1 Paths:2]
+[#34(32) Type:1 Paths:1][#35(32) Type:2 Paths:1][#36(33) Type:1 Paths:1][#37(33) Type:2 Paths:1]
+=====================
+outputFile: 1
+[#1 Type:0 Paths:1]
+=====================
+isClassDecl: 2
+[#1 Type:0 Paths:2]
+[#2(1) Type:-1 Paths:2]
+[#3(2) Type:1 Paths:1][#4(2) Type:2 Paths:1]
+=====================
+isMethodDecl: 2
+[#1 Type:0 Paths:2]
+[#2(1) Type:-1 Paths:2]
+[#3(2) Type:1 Paths:1][#4(2) Type:2 Paths:1]
+=====================
+isConstrDecl: 2
+[#1 Type:0 Paths:2]
+[#2(1) Type:-1 Paths:2]
+[#3(2) Type:1 Paths:1][#4(2) Type:2 Paths:1]
+=====================
+isVarDecl: 4
+[#1 Type:0 Paths:4]
+[#2(1) Type:-1 Paths:2][#3(1) Type:-1 Paths:2]
+[#4(2) Type:1 Paths:1][#5(2) Type:2 Paths:1][#6(3) Type:1 Paths:1][#7(3) Type:2 Paths:1]
+=====================
+beginsBlock: 2
+[#1 Type:0 Paths:2]
+[#2(1) Type:-1 Paths:2]
+[#3(2) Type:1 Paths:1][#4(2) Type:2 Paths:1]
+=====================
+endsBlock: 2
+[#1 Type:0 Paths:2]
+[#2(1) Type:-1 Paths:2]
+[#3(2) Type:1 Paths:1][#4(2) Type:2 Paths:1]
+=====================
+beginsCommentBlock: 2
+[#1 Type:0 Paths:2]
+[#2(1) Type:-1 Paths:2]
+[#3(2) Type:1 Paths:1][#4(2) Type:2 Paths:1]
+=====================
+containsCommentBlock: 2
+[#1 Type:0 Paths:2]
+[#2(1) Type:-1 Paths:2]
+[#3(2) Type:1 Paths:1][#4(2) Type:2 Paths:1]
+=====================
+endsCommentBlock: 2
+[#1 Type:0 Paths:2]
+[#2(1) Type:-1 Paths:2]
+[#3(2) Type:1 Paths:1][#4(2) Type:2 Paths:1]
+=====================
+yieldsAssertion: 36
+[#1 Type:0 Paths:36]
+[#2(1) Type:-1 Paths:2][#3(1) Type:-1 Paths:2][#4(1) Type:-1 Paths:9]
+[#5(2) Type:1 Paths:1][#6(2) Type:2 Paths:1][#7(3) Type:1 Paths:1][#8(3) Type:2 Paths:1][#9(4) Type:1 Paths:1][#10(4) Type:2 Paths:8]
+[#11(10) Type:-1 Paths:2][#12(10) Type:-1 Paths:2][#13(10) Type:-1 Paths:2]
+[#14(11) Type:1 Paths:1][#15(11) Type:2 Paths:1][#16(12) Type:1 Paths:1][#17(12) Type:2 Paths:1][#18(13) Type:1 Paths:1][#19(13) Type:2 Paths:1]
+=====================
+yieldsNewTest: 1
+[#1 Type:0 Paths:1]
+=====================
+antlrPass: 1
+[#1 Type:0 Paths:1]
+=====================
+walkParseTree: 2
+[#1 Type:0 Paths:2]
+[#2(1) Type:-1 Paths:2]
+[#3(2) Type:1 Paths:1][#4(2) Type:2 Paths:1]
+=====================
+antlrGenSynTree: 1
+[#1 Type:0 Paths:1]
+=====================
+genParsedTests: 2
+[#1 Type:0 Paths:2]
+[#2(1) Type:-1 Paths:2]
+[#3(2) Type:1 Paths:1][#4(2) Type:2 Paths:1]
+=====================
+main: 1
+[#1 Type:0 Paths:1]
+=====================
+CodeCollecter: 1
+[#1 Type:0 Paths:1]
+=====================
+collectCode: 1
+[#1 Type:0 Paths:1]
+=====================
+collectSynTree: 241
+[#1 Type:0 Paths:241]
+[#2(1) Type:-1 Paths:241]
+[#3(2) Type:1 Paths:240][#4(2) Type:2 Paths:1]
+[#5(3) Type:-1 Paths:3][#6(3) Type:-1 Paths:2][#7(3) Type:-1 Paths:5][#8(3) Type:-1 Paths:2][#9(3) Type:-1 Paths:2][#10(3) Type:-1 Paths:2]
+[#11(5) Type:1 Paths:2][#12(5) Type:2 Paths:1][#13(6) Type:1 Paths:1][#14(6) Type:2 Paths:1][#15(7) Type:1 Paths:4][#16(7) Type:2 Paths:1][#17(8) Type:1 Paths:1][#18(8) Type:2 Paths:1][#19(9) Type:1 Paths:1][#20(9) Type:2 Paths:1][#21(10) Type:1 Paths:1][#22(10) Type:2 Paths:1]
+[#23(11) Type:-1 Paths:2][#24(15) Type:-1 Paths:2][#25(15) Type:-1 Paths:2]
+[#26(23) Type:1 Paths:1][#27(23) Type:2 Paths:1][#28(24) Type:1 Paths:1][#29(24) Type:2 Paths:1][#30(25) Type:1 Paths:1][#31(25) Type:2 Paths:1]
+=====================
+processNode: 2
+[#1 Type:0 Paths:2]
+[#2(1) Type:-1 Paths:2]
+[#3(2) Type:1 Paths:1][#4(2) Type:2 Paths:1]
+=====================
+sort: 1
+[#1 Type:0 Paths:1]
+=====================

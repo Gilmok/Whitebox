@@ -1,0 +1,12 @@
+class TestTests
+{
+
+   public void testFunction()
+   {
+   }
+
+   public void testFunctionTestMeth1_0()
+   {
+   }
+}
+

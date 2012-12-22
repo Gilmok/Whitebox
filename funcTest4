@@ -1,0 +1,174 @@
+   public void actionPerformed(ActionEvent e)
+   {
+      if(e.getSource() == methButton)
+      {
+         DefaultMutableTreeNode node = (DefaultMutableTreeNode)
+         testTree.getLastSelectedPathComponent();
+
+         if (node == null) 
+            return;
+         if(node.getUserObject().getClass().getName().equals("java.lang.String"))
+            return; 
+         else if(node.getUserObject().getClass().getName().equals("MethodInfo"))
+         {
+        	 MethodInfo mi = (MethodInfo) node.getUserObject();
+        	 FunctionViewUI pan = new FunctionViewUI(mi);
+         }
+         else
+         {
+        	TestInfo ti = (TestInfo) node.getUserObject();
+        	FunctionViewUI pan = new FunctionViewUI(ti.getAssocMethod()); 
+         }
+         
+         
+      }
+      else if(e.getSource() == fsb.okBtn)
+      {
+         fsb.okBtn.removeActionListener(this);
+         progPath.set(fsb.pathTxt.getText());
+         progPattern.set(fsb.patternTxt.getText());
+         updateTests(progPath.get(), progPattern.get(), false);
+         fsb.setVisible(false);
+      }
+      else if(e.getSource() == loadTests)
+      {
+         selectFileToOpen();
+         loadTestConfig(testOutputFile.get());
+      }
+      else if(e.getSource() == saveTests)
+      {
+         selectFileToSave();
+         saveTestConfig(testOutputFile.get());
+      }
+      else if(e.getSource() == exit)
+      {
+         System.exit(0);
+      }
+      else if(e.getSource() == extractTests)
+      {
+         selectPatternToOpen();
+      }
+      else if(e.getSource() == reExtract)
+      {
+         updateTests(progPath.get(), progPattern.get(), false);
+      }
+      else if(e.getSource() == close)
+      {
+         testClassList = new ClassList();
+         progClassList = new ClassList();
+         progPath.set("");
+         progPattern.set("");
+         testOutputFile.set("");
+         testOutputFilePath.set("");
+         fillTree(testClassList);
+         
+      }
+      
+      else if(e.getSource() == add)
+      {
+         ClassInfo ci;
+         DefaultMutableTreeNode node = (DefaultMutableTreeNode)
+            testTree.getLastSelectedPathComponent();
+
+         if (node == null) 
+            return;
+         if(node.getUserObject().getClass().getName().equals("java.lang.String"))
+         {
+            String str = (String) node.getUserObject();
+            ci = testClassList.findClassWithName(str);
+         }
+         else
+         {
+            MethodInfo mi = (MethodInfo) node.getUserObject();
+            ci = testClassList.findClassWithMethod(mi);
+         }
+         int i = 0;
+         String testMethodName = ci.className + "TestUser" + i;
+         while(ci.methods.getMethodWithName(testMethodName) != null)
+            i++;
+         MethodInfo newMethod = new MethodInfo("   void " + testMethodName + "()", -1, null, ci.classIndex);
+         ci.methods.add(newMethod);
+         
+         //reset the tree
+         fillTree(testClassList);
+         
+         //select the latest tree
+         testTree.setSelectionPath(findObjectInTree(newMethod));
+      }
+      
+      else if(e.getSource() == compile)
+      {
+         String path1 = System.getProperty("user.dir");
+         MethodInfo mi = getSelectedMI();
+         ClassInfo ci;
+         //did you select a class?
+         if(mi == null)
+         {
+            ci = testClassList.findClassWithName(getSelectedCI());
+            for(int i = 0; i < ci.methods.size(); i++)
+            {
+               mi = ci.methods.getMethod(i);
+               String fName = dumpTempTest(mi, path1);
+               String[] filePath = new String[2];
+               int j = fName.lastIndexOf("\\");
+               filePath[0] = fName.substring(0, j);
+               filePath[1] = fName.substring(j + 1, fName.length());
+               boolean status = compileTests(filePath[0], filePath[1]);
+               //report the status and get rid of the temp directory
+               if(status)
+                  mi.setCompileState(1);
+               else
+                  mi.setCompileState(2);
+               File f = new File(fName);
+               f.delete();
+            }
+         }
+         else
+         {
+            String fName = dumpTempTest(mi, path1);
+            String[] filePath = new String[2];
+            int i = fName.lastIndexOf("\\");
+            filePath[0] = fName.substring(0, i);
+            filePath[1] = fName.substring(i + 1, fName.length());
+            boolean status = compileTests(filePath[0], filePath[1]);
+            //report the status and get rid of the temp directory
+            if(status)
+               mi.setCompileState(1);
+            else
+               mi.setCompileState(2);
+            File f = new File(fName);
+            f.delete();
+         }
+         fillTree(testClassList);
+      }
+      
+      else if(e.getSource() == run)
+      {
+         String path1 = System.getProperty("user.dir");
+         MethodInfo mi = getSelectedMI();
+         ClassInfo ci;
+         String[] tests;
+         //did you select a class?
+         if(mi == null)
+         {
+            ci = testClassList.findClassWithName(getSelectedCI());
+            tests = new String[ci.methods.size()];
+            for(int i = 0; i < ci.methods.size(); i++)
+            {
+               tests[i] = ci.methods.getMethod(i).name;
+            }   
+         }
+         else
+         {
+            tests = new String[1];
+            tests[0] = mi.name;
+            ci = testClassList.getClass(mi.classIndex);
+         }
+         String fName = dumpTestClass(ci, path1 + "\\" + ci.className + ".java", tests);
+         compileTests(path1, ci.className + ".java");
+         runTests(path1, ci.className + ".java");
+         fillTree(testClassList);
+      }
+      
+      fillTree(testClassList);
+   }
